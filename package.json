@@ -1,0 +1,9 @@
+{
+  "name": "kh-field-notes",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "npm run build && python3 -m http.server 3000 --directory dist"
+  },
+  "type": "module"
+}
