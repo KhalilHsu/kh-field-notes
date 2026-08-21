@@ -57,7 +57,7 @@ function shell({ title, description, content, stylesheet }) {
   ${content}
 
   <aside class="floating-theme-dock" id="themeDock" aria-label="主题风格切换">
-    <div class="dock-handle" title="按住可随意拖拽，松开自动贴边" aria-hidden="true">
+    <div class="dock-handle" title="按住可随意拖拽，松开自动吸附边缘" aria-hidden="true">
       <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor">
         <circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/>
         <circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/>
@@ -72,11 +72,11 @@ function shell({ title, description, content, stylesheet }) {
 
   <script>
     (function() {
-      // 1. Theme switching logic
+      // 1. Theme sync function
       function syncTheme(theme) {
         var t = theme === 'cards' ? 'cards' : 'editorial';
         document.documentElement.setAttribute('data-theme', t);
-        localStorage.setItem('kh-theme', t);
+        try { localStorage.setItem('kh-theme', t); } catch(e) {}
         var buttons = document.querySelectorAll('.theme-seg-btn');
         buttons.forEach(function(btn) {
           var active = btn.getAttribute('data-theme-val') === t;
@@ -84,18 +84,35 @@ function shell({ title, description, content, stylesheet }) {
           btn.setAttribute('aria-checked', active ? 'true' : 'false');
         });
       }
-      var currentTheme = localStorage.getItem('kh-theme') || 'editorial';
-      syncTheme(currentTheme);
 
-      // 2. Floating dock draggable & magnetic edge-snapping logic
+      // Initialize active button state
+      var initialTheme = localStorage.getItem('kh-theme') || 'editorial';
+      syncTheme(initialTheme);
+
+      // 2. Button direct click listeners (Rock-solid click handling)
+      var buttons = document.querySelectorAll('.theme-seg-btn');
+      buttons.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          if (isDragging) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          var val = this.getAttribute('data-theme-val');
+          syncTheme(val);
+        });
+      });
+
+      // 3. Floating Dock 4-way Draggable & Magnetic Edge-Snapping Logic
       var dock = document.getElementById('themeDock');
       if (!dock) return;
 
       var MARGIN = 18;
+      var DRAG_THRESHOLD = 6;
       var currentX = 0;
       var currentY = 0;
+      var isPointerDown = false;
       var isDragging = false;
-      var hasMoved = false;
       var startPointerX = 0, startPointerY = 0;
       var startDockX = 0, startDockY = 0;
 
@@ -104,123 +121,152 @@ function shell({ title, description, content, stylesheet }) {
       }
 
       function setPosition(x, y, animate) {
-        dock.style.transition = animate ? 'transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28), box-shadow 0.2s ease' : 'none';
+        dock.style.transition = animate ? 'transform 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28), box-shadow 0.2s ease' : 'none';
         dock.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
         currentX = x;
         currentY = y;
       }
 
-      function snapToEdge() {
+      function snapTo4Edges() {
         var rect = dock.getBoundingClientRect();
-        var dockWidth = rect.width;
-        var dockHeight = rect.height;
-        var winWidth = window.innerWidth;
-        var winHeight = window.innerHeight;
+        var dockW = rect.width || 210;
+        var dockH = rect.height || 44;
+        var winW = window.innerWidth;
+        var winH = window.innerHeight;
 
-        var clampY = clamp(currentY, MARGIN, Math.max(MARGIN, winHeight - dockHeight - MARGIN));
-        var midX = currentX + dockWidth / 2;
-        var targetX = midX > winWidth / 2 ? (winWidth - dockWidth - MARGIN) : MARGIN;
+        var minX = MARGIN;
+        var maxX = Math.max(MARGIN, winW - dockW - MARGIN);
+        var minY = MARGIN;
+        var maxY = Math.max(MARGIN, winH - dockH - MARGIN);
 
-        setPosition(targetX, clampY, true);
+        // Distance from dock to 4 edges (Left, Right, Top, Bottom)
+        var distLeft = Math.abs(currentX - minX);
+        var distRight = Math.abs(maxX - currentX);
+        var distTop = Math.abs(currentY - minY);
+        var distBottom = Math.abs(maxY - currentY);
+
+        var minDist = Math.min(distLeft, distRight, distTop, distBottom);
+
+        var targetX = clamp(currentX, minX, maxX);
+        var targetY = clamp(currentY, minY, maxY);
+        var edge = 'right';
+
+        if (minDist === distLeft) {
+          targetX = minX;
+          edge = 'left';
+        } else if (minDist === distRight) {
+          targetX = maxX;
+          edge = 'right';
+        } else if (minDist === distTop) {
+          targetY = minY;
+          edge = 'top';
+        } else if (minDist === distBottom) {
+          targetY = maxY;
+          edge = 'bottom';
+        }
+
+        setPosition(targetX, targetY, true);
 
         try {
           localStorage.setItem('kh-dock-pos', JSON.stringify({
-            side: targetX === MARGIN ? 'left' : 'right',
-            ratioY: winHeight > 0 ? clampY / winHeight : 0.1,
-            y: clampY
+            edge: edge,
+            x: targetX,
+            y: targetY,
+            ratioX: winW > 0 ? targetX / winW : 0.9,
+            ratioY: winH > 0 ? targetY / winH : 0.1
           }));
         } catch(e) {}
       }
 
       function initDockPosition() {
         var rect = dock.getBoundingClientRect();
-        var dockWidth = rect.width || 210;
-        var dockHeight = rect.height || 44;
-        var winWidth = window.innerWidth;
-        var winHeight = window.innerHeight;
+        var dockW = rect.width || 210;
+        var dockH = rect.height || 44;
+        var winW = window.innerWidth;
+        var winH = window.innerHeight;
 
-        var initX = winWidth - dockWidth - MARGIN;
-        var initY = 72;
+        var minX = MARGIN;
+        var maxX = Math.max(MARGIN, winW - dockW - MARGIN);
+        var minY = MARGIN;
+        var maxY = Math.max(MARGIN, winH - dockH - MARGIN);
+
+        var initX = maxX;
+        var initY = clamp(72, minY, maxY);
 
         try {
           var saved = JSON.parse(localStorage.getItem('kh-dock-pos'));
           if (saved) {
-            initX = saved.side === 'left' ? MARGIN : (winWidth - dockWidth - MARGIN);
-            if (typeof saved.ratioY === 'number') {
-              initY = clamp(saved.ratioY * winHeight, MARGIN, winHeight - dockHeight - MARGIN);
-            } else if (typeof saved.y === 'number') {
-              initY = clamp(saved.y, MARGIN, winHeight - dockHeight - MARGIN);
-            }
+            var restoredX = typeof saved.ratioX === 'number' ? saved.ratioX * winW : saved.x;
+            var restoredY = typeof saved.ratioY === 'number' ? saved.ratioY * winH : saved.y;
+
+            if (saved.edge === 'left') restoredX = minX;
+            else if (saved.edge === 'right') restoredX = maxX;
+            else if (saved.edge === 'top') restoredY = minY;
+            else if (saved.edge === 'bottom') restoredY = maxY;
+
+            initX = clamp(restoredX, minX, maxX);
+            initY = clamp(restoredY, minY, maxY);
           }
         } catch(e) {}
 
         setPosition(initX, initY, false);
       }
 
-      // Initialize position on load
+      // Initial position on load
       initDockPosition();
+
       window.addEventListener('resize', function() {
-        snapToEdge();
+        snapTo4Edges();
       });
 
       dock.addEventListener('pointerdown', function(e) {
         if (e.button !== 0) return;
-        isDragging = true;
-        hasMoved = false;
+        isPointerDown = true;
+        isDragging = false;
         startPointerX = e.clientX;
         startPointerY = e.clientY;
         startDockX = currentX;
         startDockY = currentY;
-
-        dock.classList.add('is-dragging');
-        dock.style.transition = 'none';
-        try { dock.setPointerCapture(e.pointerId); } catch(err) {}
       });
 
-      dock.addEventListener('pointermove', function(e) {
-        if (!isDragging) return;
+      window.addEventListener('pointermove', function(e) {
+        if (!isPointerDown) return;
         var dx = e.clientX - startPointerX;
         var dy = e.clientY - startPointerY;
 
-        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
-          hasMoved = true;
+        if (!isDragging && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+          isDragging = true;
+          dock.classList.add('is-dragging');
+          dock.style.transition = 'none';
         }
 
-        var rect = dock.getBoundingClientRect();
-        var winWidth = window.innerWidth;
-        var winHeight = window.innerHeight;
+        if (isDragging) {
+          var rect = dock.getBoundingClientRect();
+          var winW = window.innerWidth;
+          var winH = window.innerHeight;
 
-        var nextX = clamp(startDockX + dx, 0, winWidth - rect.width);
-        var nextY = clamp(startDockY + dy, 0, winHeight - rect.height);
+          var nextX = clamp(startDockX + dx, 0, winW - rect.width);
+          var nextY = clamp(startDockY + dy, 0, winH - rect.height);
 
-        setPosition(nextX, nextY, false);
+          setPosition(nextX, nextY, false);
+        }
       });
 
       function handlePointerUp(e) {
-        if (!isDragging) return;
-        isDragging = false;
-        dock.classList.remove('is-dragging');
-        try { dock.releasePointerCapture(e.pointerId); } catch(err) {}
-
-        if (hasMoved) {
-          snapToEdge();
+        if (!isPointerDown) return;
+        isPointerDown = false;
+        if (isDragging) {
+          dock.classList.remove('is-dragging');
+          snapTo4Edges();
+          // Delay resetting isDragging slightly to ensure click event is ignored if it was a drag
+          setTimeout(function() {
+            isDragging = false;
+          }, 60);
         }
       }
 
-      dock.addEventListener('pointerup', handlePointerUp);
-      dock.addEventListener('pointercancel', handlePointerUp);
-
-      dock.addEventListener('click', function(e) {
-        if (hasMoved) {
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
-        var btn = e.target.closest('.theme-seg-btn');
-        if (btn) {
-          syncTheme(btn.getAttribute('data-theme-val'));
-        }
-      });
+      window.addEventListener('pointerup', handlePointerUp);
+      window.addEventListener('pointercancel', handlePointerUp);
     })();
   </script>
 </body>
@@ -377,7 +423,7 @@ img {
 }
 
 /* ==========================================================================
-   Floating Draggable & Magnetic Edge-Snapping Theme Dock
+   Floating Draggable & 4-Way Magnetic Edge-Snapping Theme Dock
    ========================================================================== */
 .floating-theme-dock {
   position: fixed;
@@ -1214,4 +1260,4 @@ html[data-theme="cards"] .back:hover {
 `;
 
 await writeFile(path.join(outputDirectory, "styles.css"), css.trim());
-console.log(`Built ${posts.length} posts in dist/ with floating draggable theme dock.`);
+console.log(`Built ${posts.length} posts in dist/ with 4-way magnetic snapping dock.`);
