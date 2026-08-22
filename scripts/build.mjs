@@ -42,7 +42,7 @@ function parsePost(source, filename) {
   return { ...metadata, cover: metadata.cover || fallbackCover, slug: path.basename(filename, ".md"), body: match[2].trim() };
 }
 
-function shell({ title, description, content, stylesheet }) {
+function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -50,6 +50,9 @@ function shell({ title, description, content, stylesheet }) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="${escapeHtml(description)}">
   <title>${escapeHtml(title)} · KH Field Notes</title>
+  <link rel="icon" href="${assetPrefix}favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="${assetPrefix}favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="${assetPrefix}apple-touch-icon.png">
   <script>(function(){var t=localStorage.getItem('kh-theme')||'editorial';if(t==='cards')t='magazine';document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="${stylesheet}">
 </head>
@@ -426,6 +429,13 @@ await mkdir(path.join(outputDirectory, "archive"), { recursive: true });
 await mkdir(path.join(outputDirectory, "post"), { recursive: true });
 try { await cp(path.join(contentDirectory, "media"), path.join(outputDirectory, "media"), { recursive: true }); } catch (error) { if (error.code !== "ENOENT") throw error; }
 
+const faviconFiles = ["favicon.svg", "favicon.png", "favicon.ico", "apple-touch-icon.png"];
+for (const file of faviconFiles) {
+  try {
+    await cp(path.join(contentDirectory, file), path.join(outputDirectory, file));
+  } catch (e) {}
+}
+
 const filenames = (await readdir(contentDirectory)).filter((name) => name.endsWith(".md"));
 const posts = (await Promise.all(filenames.map(async (filename) => parsePost(await readFile(path.join(contentDirectory, filename), "utf8"), filename)))).sort((a, b) => b.date.localeCompare(a.date));
 
@@ -443,7 +453,7 @@ const introduction = `
   ${posts.length > latestPosts.length ? `<p class="archive-link"><a href="archive/">查看全部 ${posts.length} 篇文章 →</a></p>` : ""}
 </main>`;
 
-await writeFile(path.join(outputDirectory, "index.html"), shell({ title: "KH Field Notes", description: "一些做过的事、注意到的东西，和还没想清楚的问题。", content: `${header("./", "archive/", "home")}${introduction}`, stylesheet: "styles.css" }));
+await writeFile(path.join(outputDirectory, "index.html"), shell({ title: "KH Field Notes", description: "一些做过的事、注意到的东西，和还没想清楚的问题。", content: `${header("./", "archive/", "home")}${introduction}`, stylesheet: "styles.css", assetPrefix: "" }));
 
 for (let page = 1; page <= Math.ceil(posts.length / pageSize); page += 1) {
   const slice = posts.slice((page - 1) * pageSize, page * pageSize);
@@ -462,7 +472,7 @@ for (let page = 1; page <= Math.ceil(posts.length / pageSize); page += 1) {
   const directory = page === 1 ? path.join(outputDirectory, "archive") : path.join(outputDirectory, "archive", "page", String(page));
   await mkdir(directory, { recursive: true });
   const depth = page === 1 ? "../" : "../../../";
-  await writeFile(path.join(directory, "index.html"), shell({ title: "归档", description: "KH Field Notes 的所有文章。", content: `${header(depth, "./", "archive")}${archive}`, stylesheet: `${depth}styles.css` }));
+  await writeFile(path.join(directory, "index.html"), shell({ title: "归档", description: "KH Field Notes 的所有文章。", content: `${header(depth, "./", "archive")}${archive}`, stylesheet: `${depth}styles.css`, assetPrefix: depth }));
 }
 
 for (const post of posts) {
@@ -482,7 +492,7 @@ for (const post of posts) {
   <div class="article-body">${paragraphize(post.body, "../../")}</div>
   <a class="back" href="../../">← 返回文章列表</a>
 </main>`;
-  await writeFile(path.join(directory, "index.html"), shell({ title: post.title, description: post.summary, content: `${header("../../", "../../archive/", "article")}${article}`, stylesheet: "../../styles.css" }));
+  await writeFile(path.join(directory, "index.html"), shell({ title: post.title, description: post.summary, content: `${header("../../", "../../archive/", "article")}${article}`, stylesheet: "../../styles.css", assetPrefix: "../../" }));
 }
 
 const css = `
