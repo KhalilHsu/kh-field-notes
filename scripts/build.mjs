@@ -543,23 +543,27 @@ img {
 }
 
 .dock-handle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   opacity: 0.45;
   color: currentColor;
   cursor: grab;
-  padding: 4px 2px;
-  transition: opacity 0.2s ease;
+  padding: 6px 6px;
+  border-radius: 9999px;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
   flex-shrink: 0;
 }
 
-.floating-theme-dock:hover .dock-handle {
-  opacity: 0.85;
+.dock-handle:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .floating-theme-dock.is-dragging .dock-handle {
   cursor: grabbing;
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.12);
 }
 
 .theme-switcher {
@@ -596,7 +600,7 @@ img {
 }
 
 /* 1. COLLAPSED STATE (Default view): Non-active button folds away */
-.floating-theme-dock:not(:hover):not(.is-dragging) .theme-seg-btn:not(.active) {
+.floating-theme-dock .theme-seg-btn:not(.active) {
   max-width: 0;
   padding-left: 0;
   padding-right: 0;
@@ -606,28 +610,28 @@ img {
   pointer-events: none;
 }
 
-.floating-theme-dock:not(:hover):not(.is-dragging) .theme-seg-btn.active {
+.floating-theme-dock .theme-seg-btn.active {
   max-width: 140px;
   padding: 6px 14px;
   opacity: 1;
   pointer-events: auto;
 }
 
-/* 2. EXPANDED STATE (Hovered or Dragging): All buttons slide open */
-.floating-theme-dock:hover .theme-seg-btn,
-.floating-theme-dock.is-dragging .theme-seg-btn {
+/* 2. EXPANDED STATE: Triggered ONLY when hovering over .theme-switcher */
+.theme-switcher:hover .theme-seg-btn,
+.theme-switcher:focus-within .theme-seg-btn {
   max-width: 140px;
   padding: 6px 14px;
   opacity: 0.65;
   pointer-events: auto;
 }
 
-.floating-theme-dock:hover .theme-seg-btn:hover {
+.theme-switcher:hover .theme-seg-btn:hover {
   opacity: 1;
 }
 
-.floating-theme-dock:hover .theme-seg-btn.active,
-.floating-theme-dock.is-dragging .theme-seg-btn.active {
+.theme-switcher:hover .theme-seg-btn.active,
+.theme-switcher:focus-within .theme-seg-btn.active {
   opacity: 1;
   font-weight: 600;
 }
