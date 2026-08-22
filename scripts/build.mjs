@@ -65,41 +65,19 @@ function shell({ title, description, content, stylesheet }) {
       </svg>
     </div>
     
-    <div class="dock-body">
-      <!-- Collapsed indicator -->
-      <div class="dock-collapsed-view" aria-hidden="true">
-        <span class="dock-current-name" id="dockCurrentName">经典报刊</span>
-        <span class="dock-expand-arrow">▾</span>
-      </div>
-
-      <!-- Expanded options tray -->
-      <div class="theme-switcher-tray">
-        <div class="theme-switcher" role="radiogroup" aria-label="主题切换">
-          <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" aria-label="经典报刊风格">经典报刊</button>
-          <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" aria-label="画报潮流风格">画报潮流</button>
-        </div>
-      </div>
+    <div class="theme-switcher" role="radiogroup" aria-label="主题切换">
+      <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" aria-label="经典报刊风格">经典报刊</button>
+      <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" aria-label="画报潮流风格">画报潮流</button>
     </div>
   </aside>
 
   <script>
     (function() {
-      var THEME_LABELS = {
-        'editorial': '经典报刊',
-        'magazine': '画报潮流',
-        'cards': '画报潮流'
-      };
-
       // 1. Theme sync function
       function syncTheme(theme) {
         var t = (theme === 'magazine' || theme === 'cards') ? 'magazine' : 'editorial';
         document.documentElement.setAttribute('data-theme', t);
         try { localStorage.setItem('kh-theme', t); } catch(e) {}
-        
-        var nameElem = document.getElementById('dockCurrentName');
-        if (nameElem) {
-          nameElem.textContent = THEME_LABELS[t] || '经典报刊';
-        }
 
         var buttons = document.querySelectorAll('.theme-seg-btn');
         buttons.forEach(function(btn) {
@@ -146,7 +124,7 @@ function shell({ title, description, content, stylesheet }) {
 
       function applyPlacement(edge, x, y, animate) {
         dock.setAttribute('data-dock-edge', edge);
-        dock.style.transition = animate ? 'top 0.32s cubic-bezier(0.25, 1, 0.5, 1), left 0.32s cubic-bezier(0.25, 1, 0.5, 1), right 0.32s cubic-bezier(0.25, 1, 0.5, 1), bottom 0.32s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
+        dock.style.transition = animate ? 'top 0.3s cubic-bezier(0.2, 0, 0, 1), left 0.3s cubic-bezier(0.2, 0, 0, 1), right 0.3s cubic-bezier(0.2, 0, 0, 1), bottom 0.3s cubic-bezier(0.2, 0, 0, 1)' : 'none';
 
         if (edge === 'right') {
           dock.style.left = 'auto';
@@ -538,13 +516,14 @@ img {
 }
 
 /* ==========================================================================
-   Collapsible & Expandable Floating Theme Dock (Silky Animation)
+   Collapsible & Expandable Floating Theme Dock (Pure & Elegant)
    ========================================================================== */
 .floating-theme-dock {
   position: fixed;
   z-index: 99999;
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   padding: 4px 6px 4px 8px;
   border-radius: 9999px;
   user-select: none;
@@ -553,85 +532,34 @@ img {
   cursor: grab;
   will-change: left, right, top, bottom;
   box-sizing: border-box;
-  /* Animate appearance and surface only, no layout jumps */
-  transition: background-color 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+  width: fit-content;
+  max-width: calc(100vw - 36px);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .floating-theme-dock.is-dragging {
   cursor: grabbing;
-  transform: scale(1.03) !important;
+  transform: scale(1.02);
 }
 
 .dock-handle {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.4;
+  opacity: 0.45;
   color: currentColor;
   cursor: grab;
-  padding: 4px 4px 4px 2px;
+  padding: 4px 2px;
   transition: opacity 0.2s ease;
   flex-shrink: 0;
 }
 
 .floating-theme-dock:hover .dock-handle {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .floating-theme-dock.is-dragging .dock-handle {
   cursor: grabbing;
-}
-
-/* Dock Content Box (Fluid Cross-Fade Container) */
-.dock-body {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-/* Collapsed view badge */
-.dock-collapsed-view {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 8px 3px 4px;
-  font: 600 12.5px/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 0.24s cubic-bezier(0.25, 1, 0.5, 1), transform 0.24s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.dock-expand-arrow {
-  font-size: 10px;
-  opacity: 0.5;
-  margin-left: 1px;
-}
-
-/* Expanded Segmented Tray */
-.theme-switcher-tray {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%) scale(0.95);
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
-  transition: opacity 0.26s cubic-bezier(0.25, 1, 0.5, 1), transform 0.26s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.26s;
-}
-
-/* Anchor tray to right by default, or left when docked on left edge */
-.floating-theme-dock[data-dock-edge="left"] .theme-switcher-tray {
-  left: 0;
-  right: auto;
-  transform-origin: left center;
-}
-.floating-theme-dock[data-dock-edge="right"] .theme-switcher-tray,
-.floating-theme-dock:not([data-dock-edge="left"]) .theme-switcher-tray {
-  right: 0;
-  left: auto;
-  transform-origin: right center;
 }
 
 .theme-switcher {
@@ -646,42 +574,62 @@ img {
 .theme-seg-btn {
   border: none;
   background: transparent;
-  padding: 5px 12px;
-  font: 500 12px/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: 500 12.5px/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: inherit;
-  opacity: 0.65;
   border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  
+  /* Smooth natural width collapse & expansion */
+  transition: max-width 0.26s cubic-bezier(0.2, 0, 0, 1),
+              padding 0.26s cubic-bezier(0.2, 0, 0, 1),
+              margin 0.26s cubic-bezier(0.2, 0, 0, 1),
+              opacity 0.2s ease,
+              background-color 0.2s ease,
+              color 0.2s ease,
+              box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
-.theme-seg-btn:hover {
-  opacity: 1;
-}
-
-.theme-seg-btn.active {
-  opacity: 1;
-  font-weight: 600;
-}
-
-/* Smooth Switch on Hover or Drag */
-.floating-theme-dock:hover .dock-collapsed-view,
-.floating-theme-dock.is-dragging .dock-collapsed-view {
+/* 1. COLLAPSED STATE (Default view): Non-active button folds away */
+.floating-theme-dock:not(:hover):not(.is-dragging) .theme-seg-btn:not(.active) {
+  max-width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
   opacity: 0;
-  transform: scale(0.92);
   pointer-events: none;
-  visibility: hidden;
 }
 
-.floating-theme-dock:hover .theme-switcher-tray,
-.floating-theme-dock.is-dragging .theme-switcher-tray {
-  position: relative;
-  top: auto;
-  transform: scale(1);
+.floating-theme-dock:not(:hover):not(.is-dragging) .theme-seg-btn.active {
+  max-width: 140px;
+  padding: 6px 14px;
   opacity: 1;
   pointer-events: auto;
-  visibility: visible;
+}
+
+/* 2. EXPANDED STATE (Hovered or Dragging): All buttons slide open */
+.floating-theme-dock:hover .theme-seg-btn,
+.floating-theme-dock.is-dragging .theme-seg-btn {
+  max-width: 140px;
+  padding: 6px 14px;
+  opacity: 0.65;
+  pointer-events: auto;
+}
+
+.floating-theme-dock:hover .theme-seg-btn:hover {
+  opacity: 1;
+}
+
+.floating-theme-dock:hover .theme-seg-btn.active,
+.floating-theme-dock.is-dragging .theme-seg-btn.active {
+  opacity: 1;
+  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -1624,7 +1572,8 @@ html[data-theme="cards"] .floating-theme-dock {
 
 html[data-theme="magazine"] .floating-theme-dock .theme-switcher,
 html[data-theme="cards"] .floating-theme-dock .theme-switcher {
-  background: rgba(0, 0, 0, 0.06);
+  background: #f0f0f0;
+  border: 1.5px solid #000000;
 }
 
 html[data-theme="magazine"] .floating-theme-dock .theme-seg-btn.active,
@@ -1632,6 +1581,7 @@ html[data-theme="cards"] .floating-theme-dock .theme-seg-btn.active {
   background: #000000;
   color: #ffffff;
   font-weight: 700;
+  box-shadow: none;
 }
 
 html[data-theme="magazine"] .floating-theme-dock.is-dragging,
@@ -1694,4 +1644,4 @@ html[data-theme="cards"] .floating-theme-dock.is-dragging {
 `;
 
 await writeFile(path.join(outputDirectory, "styles.css"), css.trim());
-console.log(`Built ${posts.length} posts in dist/ with silky smooth dock animation.`);
+console.log(`Built ${posts.length} posts in dist/ with clean and balanced collapsible floating dock.`);
