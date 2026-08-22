@@ -105,9 +105,25 @@ function shell({ title, description, content, stylesheet }) {
         });
       });
 
-      // 3. Floating Dock 4-Way Draggable, Magnetic Snapping & Top-Right Default Placement
       var dock = document.getElementById('themeDock');
       if (!dock) return;
+
+      var switcher = dock.querySelector('.theme-switcher');
+      if (switcher) {
+        // Open trigger: only when hovering the switcher itself
+        switcher.addEventListener('mouseenter', function() {
+          if (!isDragging) {
+            dock.classList.add('is-expanded');
+          }
+        });
+      }
+
+      // Close trigger: only when leaving the ENTIRE dock area (switcher + drag handle)
+      dock.addEventListener('mouseleave', function() {
+        if (!isDragging) {
+          dock.classList.remove('is-expanded');
+        }
+      });
 
       var MARGIN = 18;
       var DRAG_THRESHOLD = 6;
@@ -600,7 +616,7 @@ img {
 }
 
 /* 1. COLLAPSED STATE (Default view): Non-active button folds away */
-.floating-theme-dock .theme-seg-btn:not(.active) {
+.floating-theme-dock:not(.is-expanded) .theme-seg-btn:not(.active) {
   max-width: 0;
   padding-left: 0;
   padding-right: 0;
@@ -617,21 +633,19 @@ img {
   pointer-events: auto;
 }
 
-/* 2. EXPANDED STATE: Triggered ONLY when hovering over .theme-switcher */
-.theme-switcher:hover .theme-seg-btn,
-.theme-switcher:focus-within .theme-seg-btn {
+/* 2. EXPANDED STATE (Active when .is-expanded is present on the dock) */
+.floating-theme-dock.is-expanded .theme-seg-btn {
   max-width: 140px;
   padding: 6px 14px;
   opacity: 0.65;
   pointer-events: auto;
 }
 
-.theme-switcher:hover .theme-seg-btn:hover {
+.floating-theme-dock.is-expanded .theme-seg-btn:hover {
   opacity: 1;
 }
 
-.theme-switcher:hover .theme-seg-btn.active,
-.theme-switcher:focus-within .theme-seg-btn.active {
+.floating-theme-dock.is-expanded .theme-seg-btn.active {
   opacity: 1;
   font-weight: 600;
 }
