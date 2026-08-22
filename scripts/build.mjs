@@ -89,21 +89,57 @@ function shell({ title, description, content, stylesheet }) {
       var savedTheme = localStorage.getItem('kh-theme') || 'editorial';
       syncTheme(savedTheme);
 
-      // 2. Button direct click listeners
-      var buttons = document.querySelectorAll('.theme-seg-btn');
-      buttons.forEach(function(btn) {
+      // 2. Direct click handler for theme switcher buttons with stopPropagation
+      var themeButtons = document.querySelectorAll('.theme-seg-btn');
+      themeButtons.forEach(function(btn) {
+        btn.addEventListener('pointerdown', function(e) {
+          e.stopPropagation();
+        });
         btn.addEventListener('click', function(e) {
-          if (isDragging) {
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-          }
+          e.preventDefault();
+          e.stopPropagation();
           var val = this.getAttribute('data-theme-val');
           syncTheme(val);
         });
       });
 
-      // 3. Floating Dock 4-way Draggable & Magnetic Edge-Snapping Logic
+      // 3. Category Tag Filtering Logic (Real-time Filtering)
+      document.addEventListener('click', function(e) {
+        var filterBtn = e.target.closest('[data-filter], [data-filter-tag]');
+        if (!filterBtn) return;
+
+        var filterVal = (filterBtn.getAttribute('data-filter') || filterBtn.getAttribute('data-filter-tag') || 'ALL').trim().toUpperCase();
+
+        // Update active state on category filter bar buttons
+        document.querySelectorAll('.mag-tag-item[data-filter]').forEach(function(btn) {
+          var isCurrent = btn.getAttribute('data-filter').toUpperCase() === filterVal;
+          btn.classList.toggle('is-active', isCurrent);
+          btn.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+        });
+
+        // Filter cards in post-list
+        var postItems = document.querySelectorAll('.post-list .post-item');
+        var visibleCount = 0;
+        postItems.forEach(function(card) {
+          var cardTags = (card.getAttribute('data-tags') || '').toUpperCase();
+          var isMatch = filterVal === 'ALL' || cardTags.indexOf(filterVal) !== -1;
+          if (isMatch) {
+            card.classList.remove('is-filtered-out');
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.classList.add('is-filtered-out');
+            card.style.display = 'none';
+          }
+        });
+
+        var emptyNotice = document.getElementById('filterEmptyNotice');
+        if (emptyNotice) {
+          emptyNotice.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+      });
+
+      // 4. Floating Dock 4-Way Draggable & Magnetic Edge-Snapping Logic
       var dock = document.getElementById('themeDock');
       if (!dock) return;
 
@@ -270,7 +306,6 @@ function shell({ title, description, content, stylesheet }) {
 </html>`;
 }
 
-// Format date into standard dot format and uppercase month format (e.g. AUG 21)
 const formatDateDot = (value) => value.replaceAll("-", ".");
 const formatDateShort = (value) => {
   try {
@@ -285,10 +320,32 @@ const formatDateShort = (value) => {
 
 const renderTagBadges = (tagsStr) => {
   const tags = tagsStr.split("/").map((t) => t.trim()).filter(Boolean);
-  return tags.map((t) => `<span class="tag-badge">${escapeHtml(t)}</span>`).join("");
+  return tags.map((t) => `<button type="button" class="tag-badge" data-filter-tag="${escapeHtml(t)}" title="按标签筛选: ${escapeHtml(t)}">${escapeHtml(t)}</button>`).join("");
 };
 
-const header = (home, archive, activePage = "home") => `
+// Generate category bar tags from actual post counts
+function buildCategoryBar(posts) {
+  const tagCounts = {};
+  posts.forEach((post) => {
+    const tags = post.tags.split("/").map((t) => t.trim().toUpperCase()).filter(Boolean);
+    tags.forEach((tag) => {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    });
+  });
+
+  const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+
+  return `
+    <div class="mag-bar-tags" role="tablist" aria-label="文章分类筛选">
+      <button type="button" class="mag-tag-item is-active" data-filter="ALL" role="tab" aria-selected="true" title="查看全部文章">ALL (${posts.length})</button>
+      ${sortedTags.map(([tag, count]) => `
+        <button type="button" class="mag-tag-item" data-filter="${escapeHtml(tag)}" role="tab" aria-selected="false" title="筛选: ${escapeHtml(tag)}">${escapeHtml(tag)} (${count})</button>
+      `).join("")}
+    </div>
+  `;
+}
+
+const header = (home, archive, activePage = "home", allPosts = []) => `
 <header class="site-header">
   <div class="site-header-editorial-bar">
     <a class="site-title" href="${home}">KH Field Notes</a>
@@ -319,20 +376,16 @@ const header = (home, archive, activePage = "home") => `
       </nav>
     </div>
 
+    ${allPosts && allPosts.length > 0 ? `
     <div class="mag-bar-secondary">
-      <div class="mag-bar-tags">
-        <span class="mag-tag-item is-all">ALL (8)</span>
-        <span class="mag-tag-item">AI / AGENT (2)</span>
-        <span class="mag-tag-item">INTERFACE (2)</span>
-        <span class="mag-tag-item">MUSIC WALL (1)</span>
-        <span class="mag-tag-item">FIELD NOTES (3)</span>
-      </div>
+      ${buildCategoryBar(allPosts)}
     </div>
+    ` : ""}
   </div>
 </header>`;
 
 const postItem = (post, prefix, mediaPrefix) => `
-<article class="post-item">
+<article class="post-item" data-tags="${escapeHtml(post.tags.toUpperCase())}">
   <a class="list-cover" href="${prefix}${post.slug}/">
     <div class="cover-frame">
       <img src="${mediaPrefix}${escapeHtml(post.cover)}" alt="" loading="lazy">
@@ -354,7 +407,7 @@ const postItem = (post, prefix, mediaPrefix) => `
 </article>`;
 
 const archiveItem = (post, prefix) => `
-<article class="archive-item">
+<article class="archive-item" data-tags="${escapeHtml(post.tags.toUpperCase())}">
   <time datetime="${post.date}" class="archive-date">${formatDateDot(post.date)}</time>
   <a href="${prefix}${post.slug}/" class="archive-title">${escapeHtml(post.title)}</a>
   <div class="archive-tags">
@@ -381,11 +434,16 @@ const introduction = `
     <h1>KH Field Notes</h1>
     <p class="intro">一些做过的事、注意到的东西，和还没想清楚的问题。</p>
   </div>
-  <section class="post-list" aria-label="最新文章">${latestPosts.map((post) => postItem(post, "post/", "")).join("\n")}</section>
+  <section class="post-list" aria-label="最新文章">
+    ${latestPosts.map((post) => postItem(post, "post/", "")).join("\n")}
+  </section>
+  <div id="filterEmptyNotice" class="filter-empty-notice" style="display:none;">
+    <p>没有找到该分类下的文章。</p>
+  </div>
   ${posts.length > latestPosts.length ? `<p class="archive-link"><a href="archive/">查看全部 ${posts.length} 篇文章 →</a></p>` : ""}
 </main>`;
 
-await writeFile(path.join(outputDirectory, "index.html"), shell({ title: "KH Field Notes", description: "一些做过的事、注意到的东西，和还没想清楚的问题。", content: `${header("./", "archive/", "home")}${introduction}`, stylesheet: "styles.css" }));
+await writeFile(path.join(outputDirectory, "index.html"), shell({ title: "KH Field Notes", description: "一些做过的事、注意到的东西，和还没想清楚的问题。", content: `${header("./", "archive/", "home", posts)}${introduction}`, stylesheet: "styles.css" }));
 
 for (let page = 1; page <= Math.ceil(posts.length / pageSize); page += 1) {
   const slice = posts.slice((page - 1) * pageSize, page * pageSize);
@@ -404,7 +462,7 @@ for (let page = 1; page <= Math.ceil(posts.length / pageSize); page += 1) {
   const directory = page === 1 ? path.join(outputDirectory, "archive") : path.join(outputDirectory, "archive", "page", String(page));
   await mkdir(directory, { recursive: true });
   const depth = page === 1 ? "../" : "../../../";
-  await writeFile(path.join(directory, "index.html"), shell({ title: "归档", description: "KH Field Notes 的所有文章。", content: `${header(depth, "./", "archive")}${archive}`, stylesheet: `${depth}styles.css` }));
+  await writeFile(path.join(directory, "index.html"), shell({ title: "归档", description: "KH Field Notes 的所有文章。", content: `${header(depth, "./", "archive", posts)}${archive}`, stylesheet: `${depth}styles.css` }));
 }
 
 for (const post of posts) {
@@ -424,7 +482,7 @@ for (const post of posts) {
   <div class="article-body">${paragraphize(post.body, "../../")}</div>
   <a class="back" href="../../">← 返回文章列表</a>
 </main>`;
-  await writeFile(path.join(directory, "index.html"), shell({ title: post.title, description: post.summary, content: `${header("../../", "../../archive/", "article")}${article}`, stylesheet: "../../styles.css" }));
+  await writeFile(path.join(directory, "index.html"), shell({ title: post.title, description: post.summary, content: `${header("../../", "../../archive/", "article", posts)}${article}`, stylesheet: "../../styles.css" }));
 }
 
 const css = `
@@ -488,6 +546,10 @@ img {
 
 .floating-theme-dock:hover .dock-handle {
   opacity: 0.8;
+}
+
+.floating-theme-dock.is-dragging .dock-handle {
+  cursor: grabbing;
 }
 
 .floating-theme-dock .theme-switcher {
@@ -1002,12 +1064,12 @@ html[data-theme="cards"] .mag-nav-links a.is-current {
   text-underline-offset: 3px;
 }
 
-/* Secondary Bar: Tags Strip */
+/* Secondary Bar: Interactive Tags Strip */
 html[data-theme="magazine"] .mag-bar-secondary,
 html[data-theme="cards"] .mag-bar-secondary {
   display: flex;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding-bottom: 4px;
 }
 
 html[data-theme="magazine"] .mag-bar-tags,
@@ -1022,21 +1084,32 @@ html[data-theme="cards"] .mag-tag-item {
   display: inline-flex;
   align-items: center;
   border: 1.5px solid #000000;
-  padding: 3px 10px;
+  padding: 4px 11px;
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   background: #ffffff;
   color: #000000;
   white-space: nowrap;
+  cursor: pointer;
+  border-radius: 0;
+  transition: all 0.15s ease;
 }
 
-html[data-theme="magazine"] .mag-tag-item.is-all,
-html[data-theme="cards"] .mag-tag-item.is-all {
+html[data-theme="magazine"] .mag-tag-item:hover,
+html[data-theme="cards"] .mag-tag-item:hover {
+  background: #f0f0f0;
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 #000000;
+}
+
+html[data-theme="magazine"] .mag-tag-item.is-active,
+html[data-theme="cards"] .mag-tag-item.is-active {
   background: #000000;
   color: #ffffff;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* Page Layout */
@@ -1044,7 +1117,7 @@ html[data-theme="magazine"] .page,
 html[data-theme="cards"] .page {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 32px 24px 80px;
+  padding: 28px 24px 80px;
 }
 
 /* Multi-column dense card grid */
@@ -1065,9 +1138,10 @@ html[data-theme="cards"] .post-item {
   padding: 0;
   border: none;
   min-height: 0;
+  transition: opacity 0.2s ease;
 }
 
-/* Colorful Frame Variations (Inspired by Reference Art) */
+/* Colorful Frame Variations */
 html[data-theme="magazine"] .list-cover,
 html[data-theme="cards"] .list-cover {
   display: block;
@@ -1113,7 +1187,6 @@ html[data-theme="cards"] .post-item:nth-child(8n + 1) .cover-frame {
 html[data-theme="magazine"] .post-item:nth-child(8n + 2) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 2) .cover-frame {
   border: 7px solid #f99f38;
-  padding: 0;
 }
 
 /* Card 3: Light Warm Sand frame */
@@ -1237,11 +1310,29 @@ html[data-theme="cards"] .tag-badge {
   background: #ffffff;
   color: #000000;
   line-height: 1.2;
+  cursor: pointer;
+  border-radius: 0;
+  transition: all 0.15s ease;
+}
+
+html[data-theme="magazine"] .tag-badge:hover,
+html[data-theme="cards"] .tag-badge:hover {
+  background: #000000;
+  color: #ffffff;
 }
 
 html[data-theme="magazine"] .summary,
 html[data-theme="cards"] .summary {
-  display: none; /* In reference zine, cards focus on bold titles + tags */
+  display: none;
+}
+
+.filter-empty-notice {
+  padding: 48px 0;
+  text-align: center;
+  font-family: var(--font-impact);
+  font-size: 24px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 /* Archive page Magazine Mode */
@@ -1564,4 +1655,4 @@ html[data-theme="cards"] .floating-theme-dock.is-dragging {
 `;
 
 await writeFile(path.join(outputDirectory, "styles.css"), css.trim());
-console.log(`Built ${posts.length} posts in dist/ with Quirky Orbit / Magazine poster theme.`);
+console.log(`Built ${posts.length} posts in dist/ with fully interactive category filtering and theme dock.`);
