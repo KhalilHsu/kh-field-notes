@@ -50,7 +50,7 @@ function shell({ title, description, content, stylesheet }) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="${escapeHtml(description)}">
   <title>${escapeHtml(title)} · KH Field Notes</title>
-  <script>(function(){var t=localStorage.getItem('kh-theme')||'editorial';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <script>(function(){var t=localStorage.getItem('kh-theme')||'editorial';if(t==='cards')t='magazine';document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="${stylesheet}">
 </head>
 <body>
@@ -66,7 +66,7 @@ function shell({ title, description, content, stylesheet }) {
     </div>
     <div class="theme-switcher" role="radiogroup" aria-label="主题切换">
       <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" aria-label="经典报刊风格">经典报刊</button>
-      <button type="button" class="theme-seg-btn" data-theme-val="cards" role="radio" aria-label="现代卡片风格">现代卡片</button>
+      <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" aria-label="画报潮流风格">画报潮流</button>
     </div>
   </aside>
 
@@ -74,22 +74,22 @@ function shell({ title, description, content, stylesheet }) {
     (function() {
       // 1. Theme sync function
       function syncTheme(theme) {
-        var t = theme === 'cards' ? 'cards' : 'editorial';
+        var t = (theme === 'magazine' || theme === 'cards') ? 'magazine' : 'editorial';
         document.documentElement.setAttribute('data-theme', t);
         try { localStorage.setItem('kh-theme', t); } catch(e) {}
         var buttons = document.querySelectorAll('.theme-seg-btn');
         buttons.forEach(function(btn) {
-          var active = btn.getAttribute('data-theme-val') === t;
+          var val = btn.getAttribute('data-theme-val');
+          var active = (val === t) || (val === 'magazine' && t === 'cards');
           btn.classList.toggle('active', active);
           btn.setAttribute('aria-checked', active ? 'true' : 'false');
         });
       }
 
-      // Initialize active button state
-      var initialTheme = localStorage.getItem('kh-theme') || 'editorial';
-      syncTheme(initialTheme);
+      var savedTheme = localStorage.getItem('kh-theme') || 'editorial';
+      syncTheme(savedTheme);
 
-      // 2. Button direct click listeners (Rock-solid click handling)
+      // 2. Button direct click listeners
       var buttons = document.querySelectorAll('.theme-seg-btn');
       buttons.forEach(function(btn) {
         btn.addEventListener('click', function(e) {
@@ -139,7 +139,6 @@ function shell({ title, description, content, stylesheet }) {
         var minY = MARGIN;
         var maxY = Math.max(MARGIN, winH - dockH - MARGIN);
 
-        // Distance from dock to 4 edges (Left, Right, Top, Bottom)
         var distLeft = Math.abs(currentX - minX);
         var distRight = Math.abs(maxX - currentX);
         var distTop = Math.abs(currentY - minY);
@@ -212,7 +211,6 @@ function shell({ title, description, content, stylesheet }) {
         setPosition(initX, initY, false);
       }
 
-      // Initial position on load
       initDockPosition();
 
       window.addEventListener('resize', function() {
@@ -258,7 +256,6 @@ function shell({ title, description, content, stylesheet }) {
         if (isDragging) {
           dock.classList.remove('is-dragging');
           snapTo4Edges();
-          // Delay resetting isDragging slightly to ensure click event is ignored if it was a drag
           setTimeout(function() {
             isDragging = false;
           }, 60);
@@ -273,34 +270,97 @@ function shell({ title, description, content, stylesheet }) {
 </html>`;
 }
 
-const header = (home, archive) => `
+// Format date into standard dot format and uppercase month format (e.g. AUG 21)
+const formatDateDot = (value) => value.replaceAll("-", ".");
+const formatDateShort = (value) => {
+  try {
+    const [year, month, day] = value.split("-");
+    const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    const monthName = months[parseInt(month, 10) - 1] || month;
+    return `${monthName} ${day}`;
+  } catch (e) {
+    return value;
+  }
+};
+
+const renderTagBadges = (tagsStr) => {
+  const tags = tagsStr.split("/").map((t) => t.trim()).filter(Boolean);
+  return tags.map((t) => `<span class="tag-badge">${escapeHtml(t)}</span>`).join("");
+};
+
+const header = (home, archive, activePage = "home") => `
 <header class="site-header">
-  <a class="site-title" href="${home}">KH Field Notes</a>
-  <nav aria-label="主导航">
-    <a href="${home}">文章</a>
-    <a href="${archive}">归档</a>
-  </nav>
+  <div class="site-header-editorial-bar">
+    <a class="site-title" href="${home}">KH Field Notes</a>
+    <nav class="nav-editorial" aria-label="主导航">
+      <a href="${home}" class="${activePage === "home" ? "is-active" : ""}">文章</a>
+      <a href="${archive}" class="${activePage === "archive" ? "is-active" : ""}">归档</a>
+    </nav>
+  </div>
+
+  <div class="site-header-mag-masthead">
+    <div class="mag-masthead-main">
+      <a class="mag-logo" href="${home}">KH FIELD NOTES</a>
+      <div class="mag-slogan">
+        <span>NAVIGATING AI, TOOLS,</span>
+        <span>INTERFACES & CREATIVE</span>
+        <span>FIELD EXPERIMENTS</span>
+      </div>
+    </div>
+
+    <div class="mag-bar-primary">
+      <div class="mag-bar-left">
+        <a href="${home}" class="mag-crumb ${activePage === "home" ? "is-current" : ""}">HOME</a>
+      </div>
+      <nav class="mag-nav-links" aria-label="画报导航">
+        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">STORIES</a>
+        <a href="${archive}" class="${activePage === "archive" ? "is-current" : ""}">ARCHIVE</a>
+        <a href="https://github.com/KhalilHsu" target="_blank" rel="noopener noreferrer">GITHUB ↗</a>
+      </nav>
+    </div>
+
+    <div class="mag-bar-secondary">
+      <div class="mag-bar-tags">
+        <span class="mag-tag-item is-all">ALL (8)</span>
+        <span class="mag-tag-item">AI / AGENT (2)</span>
+        <span class="mag-tag-item">INTERFACE (2)</span>
+        <span class="mag-tag-item">MUSIC WALL (1)</span>
+        <span class="mag-tag-item">FIELD NOTES (3)</span>
+      </div>
+    </div>
+  </div>
 </header>`;
 
-const date = (value) => value.replaceAll("-", ".");
 const postItem = (post, prefix, mediaPrefix) => `
 <article class="post-item">
   <a class="list-cover" href="${prefix}${post.slug}/">
-    <img src="${mediaPrefix}${escapeHtml(post.cover)}" alt="" loading="lazy">
+    <div class="cover-frame">
+      <img src="${mediaPrefix}${escapeHtml(post.cover)}" alt="" loading="lazy">
+    </div>
   </a>
   <div class="post-copy">
-    <p class="tag">${escapeHtml(post.tags)}</p>
+    <div class="post-meta-top">
+      <time datetime="${post.date}" class="post-date-dot">${formatDateDot(post.date)}</time>
+      <time datetime="${post.date}" class="post-date-badge">${formatDateShort(post.date)}</time>
+      <div class="post-tags-container">
+        <p class="tag">${escapeHtml(post.tags)}</p>
+        <div class="tag-badges">${renderTagBadges(post.tags)}</div>
+      </div>
+    </div>
     <h2><a href="${prefix}${post.slug}/">${escapeHtml(post.title)}</a></h2>
     <p class="summary">${escapeHtml(post.summary)}</p>
-    <time datetime="${post.date}">${date(post.date)}</time>
+    <time datetime="${post.date}" class="post-date-bottom">${formatDateDot(post.date)}</time>
   </div>
 </article>`;
 
 const archiveItem = (post, prefix) => `
 <article class="archive-item">
-  <time datetime="${post.date}">${date(post.date)}</time>
-  <a href="${prefix}${post.slug}/">${escapeHtml(post.title)}</a>
-  <span>${escapeHtml(post.tags)}</span>
+  <time datetime="${post.date}" class="archive-date">${formatDateDot(post.date)}</time>
+  <a href="${prefix}${post.slug}/" class="archive-title">${escapeHtml(post.title)}</a>
+  <div class="archive-tags">
+    <span class="archive-tag-raw">${escapeHtml(post.tags)}</span>
+    <div class="archive-tag-badges">${renderTagBadges(post.tags)}</div>
+  </div>
 </article>`;
 
 const pageSize = 50;
@@ -316,14 +376,16 @@ const posts = (await Promise.all(filenames.map(async (filename) => parsePost(awa
 const latestPosts = posts.slice(0, 12);
 const introduction = `
 <main class="page">
-  <p class="eyebrow">PERSONAL NOTES</p>
-  <h1>KH Field Notes</h1>
-  <p class="intro">一些做过的事、注意到的东西，和还没想清楚的问题。</p>
+  <div class="page-intro-editorial">
+    <p class="eyebrow">PERSONAL NOTES</p>
+    <h1>KH Field Notes</h1>
+    <p class="intro">一些做过的事、注意到的东西，和还没想清楚的问题。</p>
+  </div>
   <section class="post-list" aria-label="最新文章">${latestPosts.map((post) => postItem(post, "post/", "")).join("\n")}</section>
   ${posts.length > latestPosts.length ? `<p class="archive-link"><a href="archive/">查看全部 ${posts.length} 篇文章 →</a></p>` : ""}
 </main>`;
 
-await writeFile(path.join(outputDirectory, "index.html"), shell({ title: "KH Field Notes", description: "一些做过的事、注意到的东西，和还没想清楚的问题。", content: `${header("./", "archive/")}${introduction}`, stylesheet: "styles.css" }));
+await writeFile(path.join(outputDirectory, "index.html"), shell({ title: "KH Field Notes", description: "一些做过的事、注意到的东西，和还没想清楚的问题。", content: `${header("./", "archive/", "home")}${introduction}`, stylesheet: "styles.css" }));
 
 for (let page = 1; page <= Math.ceil(posts.length / pageSize); page += 1) {
   const slice = posts.slice((page - 1) * pageSize, page * pageSize);
@@ -332,15 +394,17 @@ for (let page = 1; page <= Math.ceil(posts.length / pageSize); page += 1) {
   const pagination = previous || next ? `<p class="archive-link">${previous}${previous && next ? "　" : ""}${next}</p>` : "";
   const archive = `
 <main class="page">
-  <p class="eyebrow">ALL POSTS · ${posts.length}</p>
-  <h1>归档</h1>
+  <div class="page-intro-editorial">
+    <p class="eyebrow">ALL POSTS · ${posts.length}</p>
+    <h1>归档</h1>
+  </div>
   <section class="archive-list">${slice.map((post) => archiveItem(post, "../post/")).join("\n")}</section>
   ${pagination}
 </main>`;
   const directory = page === 1 ? path.join(outputDirectory, "archive") : path.join(outputDirectory, "archive", "page", String(page));
   await mkdir(directory, { recursive: true });
   const depth = page === 1 ? "../" : "../../../";
-  await writeFile(path.join(directory, "index.html"), shell({ title: "归档", description: "KH Field Notes 的所有文章。", content: `${header(depth, "./")}${archive}`, stylesheet: `${depth}styles.css` }));
+  await writeFile(path.join(directory, "index.html"), shell({ title: "归档", description: "KH Field Notes 的所有文章。", content: `${header(depth, "./", "archive")}${archive}`, stylesheet: `${depth}styles.css` }));
 }
 
 for (const post of posts) {
@@ -348,14 +412,19 @@ for (const post of posts) {
   await mkdir(directory, { recursive: true });
   const article = `
 <main class="article">
-  <p class="tag">${escapeHtml(post.tags)}</p>
-  <time datetime="${post.date}">${date(post.date)}</time>
+  <div class="article-meta-header">
+    <div class="article-tags-wrapper">
+      <p class="tag">${escapeHtml(post.tags)}</p>
+      <div class="tag-badges">${renderTagBadges(post.tags)}</div>
+    </div>
+    <time datetime="${post.date}" class="article-date">${formatDateDot(post.date)}</time>
+  </div>
   <h1>${escapeHtml(post.title)}</h1>
   <p class="lead">${escapeHtml(post.summary)}</p>
   <div class="article-body">${paragraphize(post.body, "../../")}</div>
   <a class="back" href="../../">← 返回文章列表</a>
 </main>`;
-  await writeFile(path.join(directory, "index.html"), shell({ title: post.title, description: post.summary, content: `${header("../../", "../../archive/")}${article}`, stylesheet: "../../styles.css" }));
+  await writeFile(path.join(directory, "index.html"), shell({ title: post.title, description: post.summary, content: `${header("../../", "../../archive/", "article")}${article}`, stylesheet: "../../styles.css" }));
 }
 
 const css = `
@@ -382,54 +451,13 @@ img {
 }
 
 /* ==========================================================================
-   Shared Header
-   ========================================================================== */
-.site-header {
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 32px 28px 24px;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.site-title {
-  font-weight: 600;
-  font-size: 18px;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: inherit;
-  text-decoration: none;
-}
-
-.site-header nav {
-  display: flex;
-  gap: 20px;
-  font: 14px/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.site-header nav a {
-  color: inherit;
-  opacity: 0.75;
-  text-decoration: none;
-  transition: opacity 0.15s ease;
-}
-
-.site-header nav a:hover {
-  opacity: 1;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-/* ==========================================================================
    Floating Draggable & 4-Way Magnetic Edge-Snapping Theme Dock
    ========================================================================== */
 .floating-theme-dock {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 9999;
+  z-index: 99999;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -451,7 +479,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.35;
+  opacity: 0.4;
   color: currentColor;
   cursor: grab;
   padding: 4px 2px;
@@ -459,11 +487,7 @@ img {
 }
 
 .floating-theme-dock:hover .dock-handle {
-  opacity: 0.7;
-}
-
-.floating-theme-dock.is-dragging .dock-handle {
-  cursor: grabbing;
+  opacity: 0.8;
 }
 
 .floating-theme-dock .theme-switcher {
@@ -496,47 +520,11 @@ img {
   font-weight: 600;
   background: #ffffff;
   color: #161513;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Dock styling in Editorial Theme */
-html[data-theme="editorial"] .floating-theme-dock {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);
-  color: #20201e;
-}
-
-html[data-theme="editorial"] .floating-theme-dock .theme-switcher {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-html[data-theme="editorial"] .floating-theme-dock.is-dragging {
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Dock styling in Cards Theme */
-html[data-theme="cards"] .floating-theme-dock {
-  background: rgba(255, 251, 245, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(22, 21, 19, 0.12);
-  box-shadow: 0 12px 36px rgba(42, 32, 19, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
-  color: #161513;
-}
-
-html[data-theme="cards"] .floating-theme-dock .theme-switcher {
-  background: rgba(22, 21, 19, 0.07);
-}
-
-html[data-theme="cards"] .floating-theme-dock.is-dragging {
-  box-shadow: 0 22px 56px rgba(42, 32, 19, 0.22), 0 4px 14px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 /* ==========================================================================
-   Theme 1: Editorial (经典报刊 · 默认)
+   THEME 1: Editorial (经典报刊 · 默认)
    ========================================================================== */
 html[data-theme="editorial"] {
   --paper: #fffefd;
@@ -551,16 +539,50 @@ html[data-theme="editorial"] body {
   font-family: ui-serif, Georgia, "Songti SC", "Noto Serif SC", serif;
 }
 
+/* Header Editorial mode */
 html[data-theme="editorial"] .site-header {
   max-width: 1080px;
+  margin: 0 auto;
   padding: 32px 28px 24px;
   border-bottom: 1px solid var(--rule);
 }
 
-html[data-theme="editorial"] .site-title {
-  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+html[data-theme="editorial"] .site-header-editorial-bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
 }
 
+html[data-theme="editorial"] .site-header-mag-masthead {
+  display: none;
+}
+
+html[data-theme="editorial"] .site-title {
+  font: 600 18px/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.02em;
+  color: inherit;
+  text-decoration: none;
+}
+
+html[data-theme="editorial"] .nav-editorial {
+  display: flex;
+  gap: 20px;
+  font: 14px/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+
+html[data-theme="editorial"] .nav-editorial a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+html[data-theme="editorial"] .nav-editorial a:hover,
+html[data-theme="editorial"] .nav-editorial a.is-active {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Page Editorial mode */
 html[data-theme="editorial"] .page {
   max-width: 1080px;
   margin: 0 auto;
@@ -613,6 +635,11 @@ html[data-theme="editorial"] .list-cover {
   border-radius: 2px;
 }
 
+html[data-theme="editorial"] .cover-frame {
+  width: 100%;
+  height: 100%;
+}
+
 html[data-theme="editorial"] .list-cover img {
   width: 100%;
   height: 100%;
@@ -624,6 +651,13 @@ html[data-theme="editorial"] .post-copy {
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
+}
+
+html[data-theme="editorial"] .post-date-badge,
+html[data-theme="editorial"] .post-date-top,
+html[data-theme="editorial"] .tag-badges,
+html[data-theme="editorial"] .archive-tag-badges {
+  display: none;
 }
 
 html[data-theme="editorial"] .post-item .tag {
@@ -655,7 +689,8 @@ html[data-theme="editorial"] .summary {
   line-height: 1.6;
 }
 
-html[data-theme="editorial"] .post-copy time {
+html[data-theme="editorial"] .post-date-bottom {
+  display: block;
   margin-top: auto;
   padding-top: 18px;
 }
@@ -705,17 +740,22 @@ html[data-theme="editorial"] .archive-link a:hover {
   text-underline-offset: 3px;
 }
 
+/* Article detail Editorial mode */
 html[data-theme="editorial"] .article {
   max-width: 1080px;
   margin: 0 auto;
   padding: 72px 28px 96px;
 }
 
-html[data-theme="editorial"] .article > .tag {
+html[data-theme="editorial"] .article-meta-header {
+  margin-bottom: 16px;
+}
+
+html[data-theme="editorial"] .article-meta-header .tag {
   margin: 0 0 14px;
 }
 
-html[data-theme="editorial"] .article > time {
+html[data-theme="editorial"] .article-date {
   display: block;
   margin-bottom: 20px;
 }
@@ -810,421 +850,681 @@ html[data-theme="editorial"] .back:hover {
   text-underline-offset: 3px;
 }
 
+html[data-theme="editorial"] .floating-theme-dock {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);
+  color: #20201e;
+}
+
+html[data-theme="editorial"] .floating-theme-dock .theme-switcher {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="editorial"] .floating-theme-dock.is-dragging {
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+}
+
+
 /* ==========================================================================
-   Theme 2: Cards (现代卡片 · 还原第一版设计语言)
+   THEME 2: Magazine / Quirky Orbit (画报潮流 · 复刻参考图视觉)
    ========================================================================== */
+html[data-theme="magazine"],
 html[data-theme="cards"] {
-  --color-canvas: #f6f3eb;
-  --color-ink: #161513;
-  --color-muted: #6f685e;
-  --color-border: rgba(22, 21, 19, 0.09);
-  --color-card-bg: rgba(255, 255, 255, 0.82);
-  --color-card-border: rgba(22, 21, 19, 0.08);
-  --color-shadow: 0 14px 36px rgba(31, 41, 55, 0.06);
-  --color-shadow-hover: 0 22px 50px rgba(42, 32, 19, 0.12);
-  background: var(--color-canvas);
+  --mag-bg: #ffffff;
+  --mag-black: #000000;
+  --mag-border: 2px solid #000000;
+  --mag-border-thick: 2.5px solid #000000;
+  --font-impact: Impact, "Arial Narrow", "Haettenschweiler", "Franklin Gothic Medium", -apple-system, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--mag-bg);
 }
 
+html[data-theme="magazine"] body,
 html[data-theme="cards"] body {
-  color: var(--color-ink);
-  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
-  background:
-    radial-gradient(circle at 12% 10%, rgba(224, 199, 150, 0.38), transparent 36%),
-    radial-gradient(circle at 88% 18%, rgba(168, 193, 183, 0.42), transparent 32%),
-    linear-gradient(180deg, #f7f3ea 0%, #f1ece4 45%, #e9e3d6 100%);
-  background-attachment: fixed;
+  color: #000000;
+  font-family: var(--font-sans);
+  background: #ffffff;
 }
 
+/* Hide editorial masthead in Magazine mode */
+html[data-theme="magazine"] .site-header-editorial-bar,
+html[data-theme="cards"] .site-header-editorial-bar {
+  display: none;
+}
+
+html[data-theme="magazine"] .page-intro-editorial,
+html[data-theme="cards"] .page-intro-editorial {
+  display: none;
+}
+
+/* Magazine Masthead */
+html[data-theme="magazine"] .site-header,
 html[data-theme="cards"] .site-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(255, 251, 245, 0.8);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--color-border);
-  padding: 20px 28px;
-}
-
-html[data-theme="cards"] .site-title {
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  font-size: 19px;
-}
-
-html[data-theme="cards"] .page {
-  max-width: 1140px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 56px 28px 88px;
+  padding: 24px 24px 0;
 }
 
-html[data-theme="cards"] .eyebrow {
-  display: inline-flex;
+html[data-theme="magazine"] .site-header-mag-masthead,
+html[data-theme="cards"] .site-header-mag-masthead {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+html[data-theme="magazine"] .mag-masthead-main,
+html[data-theme="cards"] .mag-masthead-main {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 0 16px;
+}
+
+html[data-theme="magazine"] .mag-logo,
+html[data-theme="cards"] .mag-logo {
+  font-family: var(--font-impact);
+  font-size: clamp(52px, 8.8vw, 106px);
+  line-height: 0.88;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: #000000;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+html[data-theme="magazine"] .mag-slogan,
+html[data-theme="cards"] .mag-slogan {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-impact);
+  font-size: clamp(16px, 2.3vw, 26px);
+  line-height: 0.96;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  text-align: left;
+  max-width: 380px;
+  color: #000000;
+  padding-bottom: 4px;
+}
+
+/* Primary Bar: Black Outline Box */
+html[data-theme="magazine"] .mag-bar-primary,
+html[data-theme="cards"] .mag-bar-primary {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: rgba(22, 21, 19, 0.06);
-  border: 1px solid rgba(22, 21, 19, 0.08);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  margin-bottom: 16px;
+  border: var(--mag-border-thick);
+  padding: 8px 16px;
+  background: #ffffff;
 }
 
-html[data-theme="cards"] .page h1 {
-  font-size: clamp(38px, 6vw, 62px);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1.15;
-  margin: 0 0 16px;
-}
-
-html[data-theme="cards"] .intro {
-  max-width: 42em;
-  margin: 0;
+html[data-theme="magazine"] .mag-crumb,
+html[data-theme="cards"] .mag-crumb {
+  font-family: var(--font-impact);
   font-size: 19px;
-  line-height: 1.6;
-  color: var(--color-muted);
-}
-
-/* Multi-column responsive card grid */
-html[data-theme="cards"] .post-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 28px;
-  margin-top: 52px;
-  border-top: none;
-}
-
-html[data-theme="cards"] .post-item {
-  display: flex;
-  flex-direction: column;
-  background: var(--color-card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--color-card-border);
-  border-radius: 22px;
-  padding: 16px;
-  box-shadow: var(--color-shadow);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
-  min-height: 0;
-}
-
-html[data-theme="cards"] .post-item:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--color-shadow-hover);
-  border-color: rgba(22, 21, 19, 0.18);
-}
-
-html[data-theme="cards"] .list-cover {
-  aspect-ratio: 16 / 10;
-  width: 100%;
-  border-radius: 14px;
-  overflow: hidden;
-  background: linear-gradient(135deg, #e4ded5, #cfc8be);
-  margin-bottom: 16px;
-}
-
-html[data-theme="cards"] .list-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-html[data-theme="cards"] .post-item:hover .list-cover img {
-  transform: scale(1.03);
-}
-
-html[data-theme="cards"] .post-copy {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 4px 6px 6px;
-}
-
-html[data-theme="cards"] .post-item .tag {
-  display: inline-block;
-  align-self: flex-start;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgba(22, 21, 19, 0.05);
-  border: 1px solid rgba(22, 21, 19, 0.06);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-muted);
-  margin: 0 0 10px;
-}
-
-html[data-theme="cards"] .post-item h2 {
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: -0.02em;
-  margin: 0 0 10px;
-}
-
-html[data-theme="cards"] .post-item h2 a {
-  color: inherit;
+  color: #000000;
   text-decoration: none;
 }
 
-html[data-theme="cards"] .post-item h2 a:hover {
+html[data-theme="magazine"] .mag-nav-links,
+html[data-theme="cards"] .mag-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+html[data-theme="magazine"] .mag-nav-links a,
+html[data-theme="cards"] .mag-nav-links a {
+  font-family: var(--font-impact);
+  font-size: 17px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #000000;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+html[data-theme="magazine"] .mag-nav-links a:hover,
+html[data-theme="cards"] .mag-nav-links a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-html[data-theme="cards"] .summary {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--color-muted);
-  margin: 0 0 18px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+html[data-theme="magazine"] .mag-nav-links a.is-current,
+html[data-theme="cards"] .mag-nav-links a.is-current {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-html[data-theme="cards"] .post-copy time {
-  margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid rgba(22, 21, 19, 0.06);
-  font-size: 12px;
+/* Secondary Bar: Tags Strip */
+html[data-theme="magazine"] .mag-bar-secondary,
+html[data-theme="cards"] .mag-bar-secondary {
+  display: flex;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+html[data-theme="magazine"] .mag-bar-tags,
+html[data-theme="cards"] .mag-bar-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+html[data-theme="magazine"] .mag-tag-item,
+html[data-theme="cards"] .mag-tag-item {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid #000000;
+  padding: 3px 10px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 800;
   letter-spacing: 0.04em;
-  color: #8c857b;
+  text-transform: uppercase;
+  background: #ffffff;
+  color: #000000;
+  white-space: nowrap;
 }
 
-/* Archive page cards */
+html[data-theme="magazine"] .mag-tag-item.is-all,
+html[data-theme="cards"] .mag-tag-item.is-all {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* Page Layout */
+html[data-theme="magazine"] .page,
+html[data-theme="cards"] .page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* Multi-column dense card grid */
+html[data-theme="magazine"] .post-list,
+html[data-theme="cards"] .post-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 36px 20px;
+  margin-top: 16px;
+  border: none;
+}
+
+html[data-theme="magazine"] .post-item,
+html[data-theme="cards"] .post-item {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  padding: 0;
+  border: none;
+  min-height: 0;
+}
+
+/* Colorful Frame Variations (Inspired by Reference Art) */
+html[data-theme="magazine"] .list-cover,
+html[data-theme="cards"] .list-cover {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+  text-decoration: none;
+}
+
+html[data-theme="magazine"] .cover-frame,
+html[data-theme="cards"] .cover-frame {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f4f4;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html[data-theme="magazine"] .post-item:hover .cover-frame,
+html[data-theme="cards"] .post-item:hover .cover-frame {
+  transform: translateY(-3px);
+}
+
+html[data-theme="magazine"] .cover-frame img,
+html[data-theme="cards"] .cover-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Frame color scheme mapping */
+/* Card 1: Rounded pill / arched silhouette */
+html[data-theme="magazine"] .post-item:nth-child(8n + 1) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 1) .cover-frame {
+  border-radius: 999px 999px 999px 999px;
+  background: #eae6df;
+  aspect-ratio: 4 / 3;
+}
+
+/* Card 2: Bright Orange frame */
+html[data-theme="magazine"] .post-item:nth-child(8n + 2) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 2) .cover-frame {
+  border: 7px solid #f99f38;
+  padding: 0;
+}
+
+/* Card 3: Light Warm Sand frame */
+html[data-theme="magazine"] .post-item:nth-child(8n + 3) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 3) .cover-frame {
+  border: 1px solid #111111;
+  aspect-ratio: 16 / 11;
+}
+
+/* Card 4: Olive Green frame */
+html[data-theme="magazine"] .post-item:nth-child(8n + 4) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 4) .cover-frame {
+  border: 7px solid #a3cc69;
+}
+
+/* Card 5: Neon Pink frame */
+html[data-theme="magazine"] .post-item:nth-child(8n + 5) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 5) .cover-frame {
+  border: 7px solid #ff2a9d;
+}
+
+/* Card 6: Warm Amber frame */
+html[data-theme="magazine"] .post-item:nth-child(8n + 6) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 6) .cover-frame {
+  border: 7px solid #f59e0b;
+}
+
+/* Card 7: Lavender / Electric Purple frame */
+html[data-theme="magazine"] .post-item:nth-child(8n + 7) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 7) .cover-frame {
+  border: 7px solid #c084fc;
+}
+
+/* Card 8: Electric Cyan frame */
+html[data-theme="magazine"] .post-item:nth-child(8n + 8) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 8) .cover-frame {
+  border: 7px solid #38bdf8;
+}
+
+/* Post Copy in Magazine mode */
+html[data-theme="magazine"] .post-copy,
+html[data-theme="cards"] .post-copy {
+  display: flex;
+  flex-direction: column;
+}
+
+html[data-theme="magazine"] .post-item h2,
+html[data-theme="cards"] .post-item h2 {
+  font-family: var(--font-impact);
+  font-size: 23px;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  font-weight: 900;
+  margin: 0 0 10px;
+  color: #000000;
+}
+
+html[data-theme="magazine"] .post-item h2 a,
+html[data-theme="cards"] .post-item h2 a {
+  color: #000000;
+  text-decoration: none;
+}
+
+html[data-theme="magazine"] .post-item h2 a:hover,
+html[data-theme="cards"] .post-item h2 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Hide editorial elements */
+html[data-theme="magazine"] .post-date-dot,
+html[data-theme="magazine"] .post-date-bottom,
+html[data-theme="magazine"] .post-tags-container .tag,
+html[data-theme="cards"] .post-date-dot,
+html[data-theme="cards"] .post-date-bottom,
+html[data-theme="cards"] .post-tags-container .tag {
+  display: none;
+}
+
+/* Show Magazine Meta Badges */
+html[data-theme="magazine"] .post-meta-top,
+html[data-theme="cards"] .post-meta-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+html[data-theme="magazine"] .post-date-badge,
+html[data-theme="cards"] .post-date-badge {
+  display: inline-block;
+  font-family: var(--font-impact);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #000000;
+  margin-right: 2px;
+}
+
+html[data-theme="magazine"] .tag-badges,
+html[data-theme="cards"] .tag-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+html[data-theme="magazine"] .tag-badge,
+html[data-theme="cards"] .tag-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid #000000;
+  padding: 2px 7px;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #ffffff;
+  color: #000000;
+  line-height: 1.2;
+}
+
+html[data-theme="magazine"] .summary,
+html[data-theme="cards"] .summary {
+  display: none; /* In reference zine, cards focus on bold titles + tags */
+}
+
+/* Archive page Magazine Mode */
+html[data-theme="magazine"] .archive-list,
 html[data-theme="cards"] .archive-list {
   display: grid;
-  gap: 12px;
-  margin-top: 40px;
+  gap: 8px;
+  margin-top: 24px;
   border-top: none;
 }
 
+html[data-theme="magazine"] .archive-item,
 html[data-theme="cards"] .archive-item {
   display: grid;
   grid-template-columns: 110px 1fr auto;
   align-items: center;
-  gap: 20px;
-  padding: 16px 22px;
-  background: var(--color-card-bg);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--color-card-border);
-  border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
-  transition: all 0.2s ease;
-  font-size: 15px;
-}
-
-html[data-theme="cards"] .archive-item:hover {
+  gap: 18px;
+  padding: 14px 18px;
+  border: var(--mag-border);
   background: #ffffff;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+html[data-theme="magazine"] .archive-item:hover,
+html[data-theme="cards"] .archive-item:hover {
+  background: #f9f9f9;
   transform: translateX(4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-  border-color: rgba(22, 21, 19, 0.16);
 }
 
-html[data-theme="cards"] .archive-item a {
-  color: inherit;
-  font-weight: 500;
+html[data-theme="magazine"] .archive-date,
+html[data-theme="cards"] .archive-date {
+  font-family: var(--font-impact);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: #000000;
+}
+
+html[data-theme="magazine"] .archive-title,
+html[data-theme="cards"] .archive-title {
+  font-family: var(--font-impact);
+  font-size: 19px;
+  text-transform: uppercase;
+  color: #000000;
   text-decoration: none;
+  letter-spacing: -0.01em;
 }
 
-html[data-theme="cards"] .archive-item a:hover {
+html[data-theme="magazine"] .archive-title:hover,
+html[data-theme="cards"] .archive-title:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-html[data-theme="cards"] .archive-item time {
-  font-size: 12px;
-  color: var(--color-muted);
+html[data-theme="magazine"] .archive-tag-raw,
+html[data-theme="cards"] .archive-tag-raw {
+  display: none;
 }
 
-html[data-theme="cards"] .archive-item span {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgba(22, 21, 19, 0.05);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--color-muted);
+html[data-theme="magazine"] .archive-tag-badges,
+html[data-theme="cards"] .archive-tag-badges {
+  display: flex;
+  gap: 6px;
 }
 
+html[data-theme="magazine"] .archive-link,
 html[data-theme="cards"] .archive-link {
   margin-top: 36px;
-  font-size: 14px;
-  font-weight: 500;
 }
 
+html[data-theme="magazine"] .archive-link a,
 html[data-theme="cards"] .archive-link a {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 18px;
-  border-radius: 999px;
-  background: var(--color-card-bg);
-  border: 1px solid var(--color-card-border);
-  color: var(--color-ink);
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  transition: all 0.2s ease;
-}
-
-html[data-theme="cards"] .archive-link a:hover {
-  background: #ffffff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-}
-
-/* Article detail card container */
-html[data-theme="cards"] .article {
-  max-width: 900px;
-  margin: 44px auto 96px;
-  padding: 56px 56px 72px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--color-card-border);
-  border-radius: 28px;
-  box-shadow: 0 24px 70px rgba(31, 41, 55, 0.06);
-}
-
-html[data-theme="cards"] .article > .tag {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: rgba(22, 21, 19, 0.06);
-  border: 1px solid rgba(22, 21, 19, 0.08);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  border: var(--mag-border-thick);
+  padding: 8px 18px;
+  font-family: var(--font-impact);
+  font-size: 16px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-muted);
-  margin: 0 0 16px;
+  color: #000000;
+  text-decoration: none;
+  background: #ffffff;
+  box-shadow: 3px 3px 0 #000000;
+  transition: all 0.15s ease;
 }
 
-html[data-theme="cards"] .article > time {
-  display: block;
-  font-size: 13px;
-  color: var(--color-muted);
-  margin-bottom: 18px;
+html[data-theme="magazine"] .archive-link a:hover,
+html[data-theme="cards"] .archive-link a:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #000000;
 }
 
+/* Article detail Magazine Mode */
+html[data-theme="magazine"] .article,
+html[data-theme="cards"] .article {
+  max-width: 960px;
+  margin: 28px auto 96px;
+  padding: 0 24px;
+}
+
+html[data-theme="magazine"] .article-meta-header,
+html[data-theme="cards"] .article-meta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: var(--mag-border-thick);
+  padding-bottom: 14px;
+  margin-bottom: 24px;
+}
+
+html[data-theme="magazine"] .article-meta-header .tag,
+html[data-theme="cards"] .article-meta-header .tag {
+  display: none;
+}
+
+html[data-theme="magazine"] .article-date,
+html[data-theme="cards"] .article-date {
+  font-family: var(--font-impact);
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  color: #000000;
+}
+
+html[data-theme="magazine"] .article h1,
 html[data-theme="cards"] .article h1 {
-  font-size: clamp(34px, 5vw, 48px);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.25;
-  margin: 0 0 18px;
+  font-family: var(--font-impact);
+  font-size: clamp(40px, 6.5vw, 68px);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  text-transform: uppercase;
+  margin: 0 0 24px;
+  color: #000000;
 }
 
+html[data-theme="magazine"] .lead,
 html[data-theme="cards"] .lead {
-  font-size: 19px;
-  line-height: 1.65;
-  color: #4b463e;
-  padding-bottom: 28px;
-  border-bottom: 1px solid rgba(22, 21, 19, 0.08);
-  margin: 0 0 36px;
+  font-size: 20px;
+  line-height: 1.6;
+  font-weight: 500;
+  color: #222222;
+  border-left: 5px solid #000000;
+  padding: 6px 0 6px 20px;
+  margin: 0 0 44px;
 }
 
+html[data-theme="magazine"] .article-body,
 html[data-theme="cards"] .article-body {
-  font-size: 17.5px;
+  font-size: 18px;
   line-height: 1.85;
-  color: #24221f;
+  color: #111111;
 }
 
+html[data-theme="magazine"] .article-body p,
 html[data-theme="cards"] .article-body p {
   margin: 0 0 1.6em;
 }
 
+html[data-theme="magazine"] .article-body figure,
 html[data-theme="cards"] .article-body figure {
   margin: 2.5em 0;
+  border: 7px solid #f99f38;
+  background: #000;
 }
 
+html[data-theme="magazine"] .article-body img,
 html[data-theme="cards"] .article-body img {
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  width: 100%;
 }
 
+html[data-theme="magazine"] .article-body figcaption,
 html[data-theme="cards"] .article-body figcaption {
-  margin-top: 12px;
-  color: var(--color-muted);
-  font-size: 13px;
-  text-align: center;
+  padding: 8px 12px;
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-top: 1.5px solid #000000;
 }
 
+html[data-theme="magazine"] .article-body code,
 html[data-theme="cards"] .article-body code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   font-size: 0.88em;
-  background: #eeeae0;
-  padding: 3px 8px;
-  border-radius: 6px;
-  color: #1e1e1e;
+  background: #f0f0f0;
+  border: 1px solid #000000;
+  padding: 2px 6px;
+  border-radius: 2px;
+  color: #000000;
 }
 
+html[data-theme="magazine"] .article-body pre,
 html[data-theme="cards"] .article-body pre {
-  background: #f4f0e6;
-  padding: 20px 24px;
-  border-radius: 14px;
-  overflow-x: auto;
-  border: 1px solid rgba(22, 21, 19, 0.08);
+  background: #f9f9f9;
+  border: var(--mag-border);
+  padding: 18px 22px;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 #000000;
   margin: 2em 0;
 }
 
+html[data-theme="magazine"] .article-body pre code,
 html[data-theme="cards"] .article-body pre code {
   background: none;
+  border: none;
   padding: 0;
   font-size: 14px;
-  line-height: 1.65;
-  color: #2c2c2a;
 }
 
+html[data-theme="magazine"] .article-body a,
 html[data-theme="cards"] .article-body a {
-  color: #161513;
+  color: #000000;
+  font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 3px;
-  font-weight: 500;
 }
 
+html[data-theme="magazine"] .back,
 html[data-theme="cards"] .back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  display: inline-block;
   margin-top: 48px;
+  border: var(--mag-border-thick);
   padding: 9px 20px;
-  border-radius: 999px;
-  background: rgba(22, 21, 19, 0.05);
-  border: 1px solid rgba(22, 21, 19, 0.08);
-  color: var(--color-ink);
-  font-size: 13px;
-  font-weight: 500;
+  font-family: var(--font-impact);
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #000000;
   text-decoration: none;
-  transition: all 0.2s ease;
+  background: #ffffff;
+  box-shadow: 3px 3px 0 #000000;
+  transition: all 0.15s ease;
 }
 
+html[data-theme="magazine"] .back:hover,
 html[data-theme="cards"] .back:hover {
-  background: #161513;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #000000;
+}
+
+/* Magazine Floating Dock Styling */
+html[data-theme="magazine"] .floating-theme-dock,
+html[data-theme="cards"] .floating-theme-dock {
+  background: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 4px 4px 0 #000000;
+  color: #000000;
+}
+
+html[data-theme="magazine"] .floating-theme-dock .theme-switcher,
+html[data-theme="cards"] .floating-theme-dock .theme-switcher {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+html[data-theme="magazine"] .floating-theme-dock .theme-seg-btn.active,
+html[data-theme="cards"] .floating-theme-dock .theme-seg-btn.active {
+  background: #000000;
   color: #ffffff;
-  border-color: #161513;
+  font-weight: 700;
+}
+
+html[data-theme="magazine"] .floating-theme-dock.is-dragging,
+html[data-theme="cards"] .floating-theme-dock.is-dragging {
+  box-shadow: 7px 7px 0 #000000;
 }
 
 /* ==========================================================================
    Responsive Adaptations
    ========================================================================== */
+@media (max-width: 1024px) {
+  html[data-theme="magazine"] .post-list,
+  html[data-theme="cards"] .post-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .site-header {
-    padding: 22px 20px;
+    padding: 20px 18px 0;
   }
-  .page,
-  html[data-theme="editorial"] .page,
-  html[data-theme="cards"] .page {
-    padding: 36px 20px 60px;
+  .page {
+    padding: 24px 18px 60px;
   }
   html[data-theme="editorial"] .post-item,
   html[data-theme="editorial"] .archive-item {
@@ -1237,27 +1537,31 @@ html[data-theme="cards"] .back:hover {
   html[data-theme="editorial"] .archive-item span {
     display: none;
   }
-  html[data-theme="cards"] .post-list {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  html[data-theme="cards"] .archive-item {
-    grid-template-columns: 90px 1fr;
+  html[data-theme="magazine"] .mag-masthead-main,
+  html[data-theme="cards"] .mag-masthead-main {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 12px;
   }
-  html[data-theme="cards"] .archive-item span {
-    display: none;
+  html[data-theme="magazine"] .post-list,
+  html[data-theme="cards"] .post-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 16px;
   }
-  html[data-theme="cards"] .article {
-    margin: 20px 16px 60px;
-    padding: 32px 22px 48px;
-    border-radius: 20px;
+  html[data-theme="magazine"] .archive-item,
+  html[data-theme="cards"] .archive-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
-  html[data-theme="editorial"] .article {
-    padding: 36px 20px 60px;
+}
+
+@media (max-width: 480px) {
+  html[data-theme="magazine"] .post-list,
+  html[data-theme="cards"] .post-list {
+    grid-template-columns: 1fr;
   }
 }
 `;
 
 await writeFile(path.join(outputDirectory, "styles.css"), css.trim());
-console.log(`Built ${posts.length} posts in dist/ with 4-way magnetic snapping dock.`);
+console.log(`Built ${posts.length} posts in dist/ with Quirky Orbit / Magazine poster theme.`);
