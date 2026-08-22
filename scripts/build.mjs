@@ -64,19 +64,39 @@ function shell({ title, description, content, stylesheet }) {
         <circle cx="2" cy="10" r="1.2"/><circle cx="6" cy="10" r="1.2"/>
       </svg>
     </div>
-    <div class="theme-switcher" role="radiogroup" aria-label="主题切换">
-      <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" aria-label="经典报刊风格">经典报刊</button>
-      <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" aria-label="画报潮流风格">画报潮流</button>
+    
+    <div class="dock-collapsed-view" aria-hidden="true">
+      <span class="dock-current-name" id="dockCurrentName">经典报刊</span>
+      <span class="dock-expand-arrow">▾</span>
+    </div>
+
+    <div class="theme-switcher-tray">
+      <div class="theme-switcher" role="radiogroup" aria-label="主题切换">
+        <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" aria-label="经典报刊风格">经典报刊</button>
+        <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" aria-label="画报潮流风格">画报潮流</button>
+      </div>
     </div>
   </aside>
 
   <script>
     (function() {
+      var THEME_LABELS = {
+        'editorial': '经典报刊',
+        'magazine': '画报潮流',
+        'cards': '画报潮流'
+      };
+
       // 1. Theme sync function
       function syncTheme(theme) {
         var t = (theme === 'magazine' || theme === 'cards') ? 'magazine' : 'editorial';
         document.documentElement.setAttribute('data-theme', t);
         try { localStorage.setItem('kh-theme', t); } catch(e) {}
+        
+        var nameElem = document.getElementById('dockCurrentName');
+        if (nameElem) {
+          nameElem.textContent = THEME_LABELS[t] || '经典报刊';
+        }
+
         var buttons = document.querySelectorAll('.theme-seg-btn');
         buttons.forEach(function(btn) {
           var val = btn.getAttribute('data-theme-val');
@@ -103,7 +123,7 @@ function shell({ title, description, content, stylesheet }) {
         });
       });
 
-      // 3. Floating Dock 4-Way Draggable & Magnetic Edge-Snapping Logic
+      // 3. Floating Dock 4-Way Draggable, Magnetic Snapping & Top-Right Default Placement
       var dock = document.getElementById('themeDock');
       if (!dock) return;
 
@@ -120,17 +140,50 @@ function shell({ title, description, content, stylesheet }) {
         return Math.max(min, Math.min(max, val));
       }
 
-      function setPosition(x, y, animate) {
-        dock.style.transition = animate ? 'transform 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28), box-shadow 0.2s ease' : 'none';
-        dock.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
+      function applyPlacement(edge, x, y, animate) {
+        dock.setAttribute('data-dock-edge', edge);
+        dock.style.transition = animate ? 'all 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28)' : 'none';
+
+        if (edge === 'right') {
+          dock.style.left = 'auto';
+          dock.style.right = MARGIN + 'px';
+          dock.style.top = y + 'px';
+          dock.style.bottom = 'auto';
+          dock.style.transform = 'none';
+        } else if (edge === 'left') {
+          dock.style.left = MARGIN + 'px';
+          dock.style.right = 'auto';
+          dock.style.top = y + 'px';
+          dock.style.bottom = 'auto';
+          dock.style.transform = 'none';
+        } else if (edge === 'top') {
+          dock.style.left = x + 'px';
+          dock.style.right = 'auto';
+          dock.style.top = MARGIN + 'px';
+          dock.style.bottom = 'auto';
+          dock.style.transform = 'none';
+        } else if (edge === 'bottom') {
+          dock.style.left = x + 'px';
+          dock.style.right = 'auto';
+          dock.style.top = 'auto';
+          dock.style.bottom = MARGIN + 'px';
+          dock.style.transform = 'none';
+        } else {
+          dock.style.left = x + 'px';
+          dock.style.top = y + 'px';
+          dock.style.right = 'auto';
+          dock.style.bottom = 'auto';
+          dock.style.transform = 'none';
+        }
+
         currentX = x;
         currentY = y;
       }
 
       function snapTo4Edges() {
         var rect = dock.getBoundingClientRect();
-        var dockW = rect.width || 210;
-        var dockH = rect.height || 44;
+        var dockW = rect.width;
+        var dockH = rect.height;
         var winW = window.innerWidth;
         var winH = window.innerHeight;
 
@@ -164,7 +217,7 @@ function shell({ title, description, content, stylesheet }) {
           edge = 'bottom';
         }
 
-        setPosition(targetX, targetY, true);
+        applyPlacement(edge, targetX, targetY, true);
 
         try {
           localStorage.setItem('kh-dock-pos', JSON.stringify({
@@ -172,15 +225,15 @@ function shell({ title, description, content, stylesheet }) {
             x: targetX,
             y: targetY,
             ratioX: winW > 0 ? targetX / winW : 0.9,
-            ratioY: winH > 0 ? targetY / winH : 0.1
+            ratioY: winH > 0 ? targetY / winH : 0.05
           }));
         } catch(e) {}
       }
 
       function initDockPosition() {
         var rect = dock.getBoundingClientRect();
-        var dockW = rect.width || 210;
-        var dockH = rect.height || 44;
+        var dockW = rect.width || 120;
+        var dockH = rect.height || 36;
         var winW = window.innerWidth;
         var winH = window.innerHeight;
 
@@ -189,12 +242,15 @@ function shell({ title, description, content, stylesheet }) {
         var minY = MARGIN;
         var maxY = Math.max(MARGIN, winH - dockH - MARGIN);
 
+        // Default top-right position (24px from top, 18px from right edge)
+        var initEdge = 'right';
         var initX = maxX;
-        var initY = clamp(72, minY, maxY);
+        var initY = clamp(24, minY, maxY);
 
         try {
           var saved = JSON.parse(localStorage.getItem('kh-dock-pos'));
-          if (saved) {
+          if (saved && saved.edge) {
+            initEdge = saved.edge;
             var restoredX = typeof saved.ratioX === 'number' ? saved.ratioX * winW : saved.x;
             var restoredY = typeof saved.ratioY === 'number' ? saved.ratioY * winH : saved.y;
 
@@ -208,7 +264,7 @@ function shell({ title, description, content, stylesheet }) {
           }
         } catch(e) {}
 
-        setPosition(initX, initY, false);
+        applyPlacement(initEdge, initX, initY, false);
       }
 
       initDockPosition();
@@ -223,8 +279,12 @@ function shell({ title, description, content, stylesheet }) {
         isDragging = false;
         startPointerX = e.clientX;
         startPointerY = e.clientY;
-        startDockX = currentX;
-        startDockY = currentY;
+
+        var rect = dock.getBoundingClientRect();
+        startDockX = rect.left;
+        startDockY = rect.top;
+        currentX = rect.left;
+        currentY = rect.top;
       });
 
       window.addEventListener('pointermove', function(e) {
@@ -246,7 +306,14 @@ function shell({ title, description, content, stylesheet }) {
           var nextX = clamp(startDockX + dx, 0, winW - rect.width);
           var nextY = clamp(startDockY + dy, 0, winH - rect.height);
 
-          setPosition(nextX, nextY, false);
+          dock.style.left = nextX + 'px';
+          dock.style.top = nextY + 'px';
+          dock.style.right = 'auto';
+          dock.style.bottom = 'auto';
+          dock.style.transform = 'none';
+
+          currentX = nextX;
+          currentY = nextY;
         }
       });
 
@@ -467,28 +534,27 @@ img {
 }
 
 /* ==========================================================================
-   Floating Draggable & 4-Way Magnetic Edge-Snapping Theme Dock
+   Collapsible & Expandable Floating Theme Dock
    ========================================================================== */
 .floating-theme-dock {
   position: fixed;
-  top: 0;
-  left: 0;
   z-index: 99999;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 6px 5px 10px;
+  padding: 4px 6px 4px 8px;
   border-radius: 9999px;
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
   cursor: grab;
-  will-change: transform;
+  will-change: transform, left, right, top, bottom;
+  box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .floating-theme-dock.is-dragging {
   cursor: grabbing;
-  transform: scale(1.03);
+  transform: scale(1.03) !important;
 }
 
 .dock-handle {
@@ -498,7 +564,7 @@ img {
   opacity: 0.4;
   color: currentColor;
   cursor: grab;
-  padding: 4px 2px;
+  padding: 4px 4px 4px 2px;
   transition: opacity 0.15s ease;
 }
 
@@ -510,19 +576,50 @@ img {
   cursor: grabbing;
 }
 
-.floating-theme-dock .theme-switcher {
+/* Collapsed label (default view) */
+.dock-collapsed-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 4px;
+  font: 600 12.5px/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.dock-expand-arrow {
+  font-size: 10px;
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+/* Expanded Segmented Control Tray */
+.theme-switcher-tray {
+  display: flex;
+  align-items: center;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, margin 0.3s ease;
+}
+
+.theme-switcher {
   display: inline-flex;
   align-items: center;
   padding: 3px;
   border-radius: 9999px;
   gap: 2px;
+  white-space: nowrap;
 }
 
-.floating-theme-dock .theme-seg-btn {
+.theme-seg-btn {
   border: none;
   background: transparent;
-  padding: 6px 14px;
-  font: 500 12.5px/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: 5px 12px;
+  font: 500 12px/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: inherit;
   opacity: 0.65;
   border-radius: 9999px;
@@ -531,16 +628,26 @@ img {
   white-space: nowrap;
 }
 
-.floating-theme-dock .theme-seg-btn:hover {
+.theme-seg-btn:hover {
   opacity: 1;
 }
 
-.floating-theme-dock .theme-seg-btn.active {
+.theme-seg-btn.active {
   opacity: 1;
   font-weight: 600;
-  background: #ffffff;
-  color: #161513;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Hover / Active Expansion States */
+.floating-theme-dock:hover .dock-collapsed-view,
+.floating-theme-dock.is-dragging .dock-collapsed-view {
+  display: none;
+}
+
+.floating-theme-dock:hover .theme-switcher-tray,
+.floating-theme-dock.is-dragging .theme-switcher-tray {
+  max-width: 320px;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* ==========================================================================
@@ -870,6 +977,7 @@ html[data-theme="editorial"] .back:hover {
   text-underline-offset: 3px;
 }
 
+/* Editorial Floating Dock Styling */
 html[data-theme="editorial"] .floating-theme-dock {
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(20px);
@@ -881,6 +989,12 @@ html[data-theme="editorial"] .floating-theme-dock {
 
 html[data-theme="editorial"] .floating-theme-dock .theme-switcher {
   background: rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="editorial"] .floating-theme-dock .theme-seg-btn.active {
+  background: #ffffff;
+  color: #161513;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 html[data-theme="editorial"] .floating-theme-dock.is-dragging {
@@ -1546,4 +1660,4 @@ html[data-theme="cards"] .floating-theme-dock.is-dragging {
 `;
 
 await writeFile(path.join(outputDirectory, "styles.css"), css.trim());
-console.log(`Built ${posts.length} posts in dist/ with clean masthead navigation.`);
+console.log(`Built ${posts.length} posts in dist/ with collapsible floating dock.`);
