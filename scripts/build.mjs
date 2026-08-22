@@ -65,15 +65,19 @@ function shell({ title, description, content, stylesheet }) {
       </svg>
     </div>
     
-    <div class="dock-collapsed-view" aria-hidden="true">
-      <span class="dock-current-name" id="dockCurrentName">经典报刊</span>
-      <span class="dock-expand-arrow">▾</span>
-    </div>
+    <div class="dock-body">
+      <!-- Collapsed indicator -->
+      <div class="dock-collapsed-view" aria-hidden="true">
+        <span class="dock-current-name" id="dockCurrentName">经典报刊</span>
+        <span class="dock-expand-arrow">▾</span>
+      </div>
 
-    <div class="theme-switcher-tray">
-      <div class="theme-switcher" role="radiogroup" aria-label="主题切换">
-        <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" aria-label="经典报刊风格">经典报刊</button>
-        <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" aria-label="画报潮流风格">画报潮流</button>
+      <!-- Expanded options tray -->
+      <div class="theme-switcher-tray">
+        <div class="theme-switcher" role="radiogroup" aria-label="主题切换">
+          <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" aria-label="经典报刊风格">经典报刊</button>
+          <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" aria-label="画报潮流风格">画报潮流</button>
+        </div>
       </div>
     </div>
   </aside>
@@ -142,7 +146,7 @@ function shell({ title, description, content, stylesheet }) {
 
       function applyPlacement(edge, x, y, animate) {
         dock.setAttribute('data-dock-edge', edge);
-        dock.style.transition = animate ? 'all 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28)' : 'none';
+        dock.style.transition = animate ? 'top 0.32s cubic-bezier(0.25, 1, 0.5, 1), left 0.32s cubic-bezier(0.25, 1, 0.5, 1), right 0.32s cubic-bezier(0.25, 1, 0.5, 1), bottom 0.32s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
 
         if (edge === 'right') {
           dock.style.left = 'auto';
@@ -534,7 +538,7 @@ img {
 }
 
 /* ==========================================================================
-   Collapsible & Expandable Floating Theme Dock
+   Collapsible & Expandable Floating Theme Dock (Silky Animation)
    ========================================================================== */
 .floating-theme-dock {
   position: fixed;
@@ -547,9 +551,10 @@ img {
   -webkit-user-select: none;
   touch-action: none;
   cursor: grab;
-  will-change: transform, left, right, top, bottom;
+  will-change: left, right, top, bottom;
   box-sizing: border-box;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Animate appearance and surface only, no layout jumps */
+  transition: background-color 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
 }
 
 .floating-theme-dock.is-dragging {
@@ -565,7 +570,8 @@ img {
   color: currentColor;
   cursor: grab;
   padding: 4px 4px 4px 2px;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
 }
 
 .floating-theme-dock:hover .dock-handle {
@@ -576,7 +582,14 @@ img {
   cursor: grabbing;
 }
 
-/* Collapsed label (default view) */
+/* Dock Content Box (Fluid Cross-Fade Container) */
+.dock-body {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Collapsed view badge */
 .dock-collapsed-view {
   display: inline-flex;
   align-items: center;
@@ -586,24 +599,39 @@ img {
   color: inherit;
   cursor: pointer;
   white-space: nowrap;
-  transition: opacity 0.2s ease;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.24s cubic-bezier(0.25, 1, 0.5, 1), transform 0.24s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .dock-expand-arrow {
   font-size: 10px;
-  opacity: 0.6;
-  transition: transform 0.2s ease;
+  opacity: 0.5;
+  margin-left: 1px;
 }
 
-/* Expanded Segmented Control Tray */
+/* Expanded Segmented Tray */
 .theme-switcher-tray {
-  display: flex;
-  align-items: center;
-  max-width: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) scale(0.95);
   opacity: 0;
-  overflow: hidden;
   pointer-events: none;
-  transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, margin 0.3s ease;
+  visibility: hidden;
+  transition: opacity 0.26s cubic-bezier(0.25, 1, 0.5, 1), transform 0.26s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.26s;
+}
+
+/* Anchor tray to right by default, or left when docked on left edge */
+.floating-theme-dock[data-dock-edge="left"] .theme-switcher-tray {
+  left: 0;
+  right: auto;
+  transform-origin: left center;
+}
+.floating-theme-dock[data-dock-edge="right"] .theme-switcher-tray,
+.floating-theme-dock:not([data-dock-edge="left"]) .theme-switcher-tray {
+  right: 0;
+  left: auto;
+  transform-origin: right center;
 }
 
 .theme-switcher {
@@ -624,7 +652,7 @@ img {
   opacity: 0.65;
   border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
   white-space: nowrap;
 }
 
@@ -637,17 +665,23 @@ img {
   font-weight: 600;
 }
 
-/* Hover / Active Expansion States */
+/* Smooth Switch on Hover or Drag */
 .floating-theme-dock:hover .dock-collapsed-view,
 .floating-theme-dock.is-dragging .dock-collapsed-view {
-  display: none;
+  opacity: 0;
+  transform: scale(0.92);
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .floating-theme-dock:hover .theme-switcher-tray,
 .floating-theme-dock.is-dragging .theme-switcher-tray {
-  max-width: 320px;
+  position: relative;
+  top: auto;
+  transform: scale(1);
   opacity: 1;
   pointer-events: auto;
+  visibility: visible;
 }
 
 /* ==========================================================================
@@ -1660,4 +1694,4 @@ html[data-theme="cards"] .floating-theme-dock.is-dragging {
 `;
 
 await writeFile(path.join(outputDirectory, "styles.css"), css.trim());
-console.log(`Built ${posts.length} posts in dist/ with collapsible floating dock.`);
+console.log(`Built ${posts.length} posts in dist/ with silky smooth dock animation.`);
