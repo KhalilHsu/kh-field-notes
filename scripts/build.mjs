@@ -293,6 +293,7 @@ function shell({ title, description, content, stylesheet }) {
         if (!isDragging && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
           isDragging = true;
           dock.classList.add('is-dragging');
+          dock.classList.remove('is-expanded');
           dock.style.transition = 'none';
         }
 
@@ -320,6 +321,7 @@ function shell({ title, description, content, stylesheet }) {
         isPointerDown = false;
         if (isDragging) {
           dock.classList.remove('is-dragging');
+          dock.classList.remove('is-expanded');
           snapTo4Edges();
           setTimeout(function() {
             isDragging = false;
