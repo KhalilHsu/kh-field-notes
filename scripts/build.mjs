@@ -21,8 +21,18 @@ function paragraphize(body, imagePrefix) {
       const idx = parseInt(trimmed.replace("<!--CODEBLOCK_", "").replace("-->", ""), 10);
       return codeBlocks[idx];
     }
-    const image = trimmed.match(/^!\[([^\]]*)\]\((media\/[^)\s]+)\)$/);
-    if (image) return `<figure><img src="${imagePrefix}${escapeHtml(image[2])}" alt="${escapeHtml(image[1])}" loading="lazy"><figcaption>${escapeHtml(image[1])}</figcaption></figure>`;
+    const media = trimmed.match(/^(?:@video|!)\[([^\]]*)\]\(([^)\s]+)\)$/i);
+    if (media) {
+      const alt = escapeHtml(media[1]);
+      const rawSrc = media[2];
+      const isExternal = /^https?:\/\//i.test(rawSrc);
+      const src = isExternal ? escapeHtml(rawSrc) : `${imagePrefix}${escapeHtml(rawSrc)}`;
+      const isVideo = trimmed.startsWith("@video") || /\.(mp4|mov|webm|m4v|ogg)$/i.test(rawSrc);
+      if (isVideo) {
+        return `<figure class="media-video"><video src="${src}" controls playsinline preload="metadata"></video>${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
+      }
+      return `<figure class="media-image"><img src="${src}" alt="${alt}" loading="lazy">${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
+    }
 
     let html = escapeHtml(paragraph);
     html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
@@ -142,6 +152,10 @@ function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
       }
 
       function applyPlacement(edge, x, y, animate) {
+        var rect = dock.getBoundingClientRect();
+        var dockW = rect.width || 110;
+        var winW = window.innerWidth;
+
         dock.setAttribute('data-dock-edge', edge);
         dock.style.transition = animate ? 'top 0.3s cubic-bezier(0.2, 0, 0, 1), left 0.3s cubic-bezier(0.2, 0, 0, 1), right 0.3s cubic-bezier(0.2, 0, 0, 1), bottom 0.3s cubic-bezier(0.2, 0, 0, 1)' : 'none';
 
@@ -158,14 +172,26 @@ function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
           dock.style.bottom = 'auto';
           dock.style.transform = 'none';
         } else if (edge === 'top') {
-          dock.style.left = x + 'px';
-          dock.style.right = 'auto';
+          var isRightSide = (x + dockW / 2) > (winW / 2);
+          if (isRightSide) {
+            dock.style.left = 'auto';
+            dock.style.right = Math.max(MARGIN, winW - x - dockW) + 'px';
+          } else {
+            dock.style.left = Math.max(MARGIN, x) + 'px';
+            dock.style.right = 'auto';
+          }
           dock.style.top = MARGIN + 'px';
           dock.style.bottom = 'auto';
           dock.style.transform = 'none';
         } else if (edge === 'bottom') {
-          dock.style.left = x + 'px';
-          dock.style.right = 'auto';
+          var isRightSide = (x + dockW / 2) > (winW / 2);
+          if (isRightSide) {
+            dock.style.left = 'auto';
+            dock.style.right = Math.max(MARGIN, winW - x - dockW) + 'px';
+          } else {
+            dock.style.left = Math.max(MARGIN, x) + 'px';
+            dock.style.right = 'auto';
+          }
           dock.style.top = 'auto';
           dock.style.bottom = MARGIN + 'px';
           dock.style.transform = 'none';
@@ -538,7 +564,8 @@ body {
   line-height: 1.7;
 }
 
-img {
+img,
+video {
   max-width: 100%;
   display: block;
 }
@@ -932,6 +959,13 @@ html[data-theme="editorial"] .article-body figure {
 
 html[data-theme="editorial"] .article-body img {
   border-radius: 2px;
+}
+
+html[data-theme="editorial"] .article-body video {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 2px;
+  display: block;
 }
 
 html[data-theme="editorial"] .article-body figcaption {
@@ -1507,25 +1541,30 @@ html[data-theme="cards"] .article-body p {
 html[data-theme="magazine"] .article-body figure,
 html[data-theme="cards"] .article-body figure {
   margin: 2.5em 0;
-  border: 7px solid #f99f38;
-  background: #000;
+  border: none;
+  background: transparent;
 }
 
 html[data-theme="magazine"] .article-body img,
-html[data-theme="cards"] .article-body img {
+html[data-theme="cards"] .article-body img,
+html[data-theme="magazine"] .article-body video,
+html[data-theme="cards"] .article-body video {
   width: 100%;
+  display: block;
+  border-radius: 4px;
 }
 
 html[data-theme="magazine"] .article-body figcaption,
 html[data-theme="cards"] .article-body figcaption {
-  padding: 8px 12px;
-  background: #ffffff;
-  color: #000000;
+  margin-top: 8px;
+  padding: 0;
+  background: transparent;
+  color: #666666;
   font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  border-top: 1.5px solid #000000;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: none;
+  border-top: none;
 }
 
 html[data-theme="magazine"] .article-body code,

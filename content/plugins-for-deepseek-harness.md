@@ -25,6 +25,8 @@ DeepSeek Harness 开源之后，我第一时间搭起来体验了一下。为了
 
 这两个插件做完之后，整个工作流顺手了许多。
 
+![DeepSeek Harness UI 插件实际交互效果演示](media/dsh-plugins-demo.mp4)
+
 总体来说，DeepSeek Harness 是一个让我挺满意的项目。它的 UI 谈不上极尽精美，但很精致，能看出经过了专门的交互考量。我尤其喜欢它的 Trace 轨迹设计——尽管整体偏 Developer-oriented，但它直观地拆解了 Agent Harness 底层的调度逻辑，能让很多人清晰看懂智能体到底是如何思考和行动的。
 
 整个插件的开发和调试过程，大概只花掉了 10 块钱出头的 API 费用。
