@@ -122,23 +122,21 @@ function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
           e.stopPropagation();
           var val = this.getAttribute('data-theme-val');
           syncTheme(val);
+          this.blur();
         });
       });
 
       var dock = document.getElementById('themeDock');
       if (!dock) return;
 
-      var switcher = dock.querySelector('.theme-switcher');
-      if (switcher) {
-        // Open trigger: only when hovering the switcher itself
-        switcher.addEventListener('mouseenter', function() {
-          if (!isDragging) {
-            dock.classList.add('is-expanded');
-          }
-        });
-      }
+      // Expand dock on hover over either switcher or entire dock
+      dock.addEventListener('mouseenter', function() {
+        if (!isDragging) {
+          dock.classList.add('is-expanded');
+        }
+      });
 
-      // Close trigger: only when leaving the ENTIRE dock area (switcher + drag handle)
+      // Collapse dock back to only active button when leaving dock area
       dock.addEventListener('mouseleave', function() {
         if (!isDragging) {
           dock.classList.remove('is-expanded');
@@ -610,9 +608,9 @@ video {
   z-index: 99999;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 3px 5px;
-  height: 38px;
+  gap: 2px;
+  padding: 3px 3px 3px 5px;
+  height: auto;
   border-radius: 9999px;
   user-select: none;
   -webkit-user-select: none;
@@ -638,7 +636,7 @@ video {
   opacity: 0.45;
   color: currentColor;
   cursor: grab;
-  padding: 6px 4px 6px 5px;
+  padding: 5px 3px 5px 3px;
   border-radius: 9999px;
   transition: opacity 0.2s ease, background-color 0.2s ease;
   flex-shrink: 0;
@@ -664,7 +662,7 @@ video {
   white-space: nowrap;
   box-sizing: border-box;
   border: 1px solid transparent;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, gap 0.25s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .theme-seg-btn {
@@ -681,7 +679,9 @@ video {
   height: 26px;
   padding: 0;
   opacity: 0.45;
-  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.25s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0, 0, 1), background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .theme-seg-btn:hover {
@@ -695,6 +695,21 @@ video {
 .theme-seg-btn svg {
   display: block;
   pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Auto-collapse / Compact state (shows only active button when not hovered/expanded) */
+.floating-theme-dock:not(.is-expanded) .theme-seg-btn:not(.active) {
+  width: 0;
+  opacity: 0;
+  transform: scale(0.7);
+  pointer-events: none;
+  margin: 0;
+  padding: 0;
+}
+
+.floating-theme-dock:not(.is-expanded) .theme-switcher {
+  gap: 0;
 }
 
 /* ==========================================================================

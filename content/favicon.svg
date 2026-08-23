@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <style>
     .bg { fill: #141413; }
-    .fg { fill: #faf9f6; }
+    .fg { fill: none; stroke: #faf9f6; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
     @media (prefers-color-scheme: dark) {
       .bg { fill: #ffffff; }
-      .fg { fill: #141413; }
+      .fg { stroke: #141413; }
     }
   </style>
   <rect class="bg" width="64" height="64" rx="16"/>
-  <!-- Centered Bold K -->
-  <rect class="fg" x="18.5" y="16" width="7.5" height="32" rx="1.5"/>
-  <polygon class="fg" points="26,33 35.5,16 45,16 32,36"/>
-  <polygon class="fg" points="30.5,31 45.5,48 36,48 24.5,35"/>
+  <g transform="translate(32, 32) scale(2.2) translate(-12, -12)">
+    <path class="fg" d="M4.5 19.5L12.5 3.5c.8-1.5 2.8-1 2.8.8 0 3.6-3.2 10.6-4.5 15.2"/>
+    <path class="fg" d="M10.8 12c1.6-1.5 4.5-1.5 4.6 1 .2 2.2-2.2 2.8-4.2 2.8 2.5.5 5.5 1.2 8.5 2.5"/>
+  </g>
 </svg>
