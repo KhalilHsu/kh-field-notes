@@ -1209,51 +1209,50 @@ html[data-theme="cards"] .cover-frame img {
   display: block;
 }
 
-/* Frame color scheme mapping */
-/* Card 1: Rounded pill / arched silhouette */
+/* Frame color scheme mapping — all cards get a consistent 7px colored border */
+/* Card 1: Warm Beige */
 html[data-theme="magazine"] .post-item:nth-child(8n + 1) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 1) .cover-frame {
-  border-radius: 999px 999px 999px 999px;
-  background: #eae6df;
+  border: 7px solid #d4c9b8;
 }
 
-/* Card 2: Bright Orange frame */
+/* Card 2: Bright Orange */
 html[data-theme="magazine"] .post-item:nth-child(8n + 2) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 2) .cover-frame {
   border: 7px solid #f99f38;
 }
 
-/* Card 3: Light Warm Sand frame */
+/* Card 3: Ink Black */
 html[data-theme="magazine"] .post-item:nth-child(8n + 3) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 3) .cover-frame {
-  border: 1px solid #111111;
+  border: 7px solid #1a1a1a;
 }
 
-/* Card 4: Olive Green frame */
+/* Card 4: Olive Green */
 html[data-theme="magazine"] .post-item:nth-child(8n + 4) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 4) .cover-frame {
   border: 7px solid #a3cc69;
 }
 
-/* Card 5: Neon Pink frame */
+/* Card 5: Neon Pink */
 html[data-theme="magazine"] .post-item:nth-child(8n + 5) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 5) .cover-frame {
   border: 7px solid #ff2a9d;
 }
 
-/* Card 6: Warm Amber frame */
+/* Card 6: Warm Amber */
 html[data-theme="magazine"] .post-item:nth-child(8n + 6) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 6) .cover-frame {
   border: 7px solid #f59e0b;
 }
 
-/* Card 7: Lavender / Electric Purple frame */
+/* Card 7: Lavender Purple */
 html[data-theme="magazine"] .post-item:nth-child(8n + 7) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 7) .cover-frame {
   border: 7px solid #c084fc;
 }
 
-/* Card 8: Electric Cyan frame */
+/* Card 8: Electric Cyan */
 html[data-theme="magazine"] .post-item:nth-child(8n + 8) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 8) .cover-frame {
   border: 7px solid #38bdf8;
