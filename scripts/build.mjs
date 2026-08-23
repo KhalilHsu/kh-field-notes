@@ -79,8 +79,15 @@ function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
     </div>
     
     <div class="theme-switcher" role="radiogroup" aria-label="主题切换">
-      <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" aria-label="经典报刊风格">经典报刊</button>
-      <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" aria-label="画报潮流风格">画报潮流</button>
+      <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" title="经典报刊 (Editorial)" aria-label="经典报刊">
+        <svg width="13" height="13" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true"><rect x="18.5" y="16" width="7.5" height="32" rx="1.5"/><polygon points="26,33 35.5,16 45,16 32,36"/><polygon points="30.5,31 45.5,48 36,48 24.5,35"/></svg>
+      </button>
+      <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" title="画报潮流 (Magazine)" aria-label="画报潮流">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="16" y2="7"/><line x1="9" y1="11" x2="14" y2="11"/></svg>
+      </button>
+      <button type="button" class="theme-seg-btn" data-theme-val="cyberdeck" role="radio" title="深潜终端 (Cyberdeck)" aria-label="深潜终端">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.5 3h4.2l5.3 13.2L17.3 3h4.2L13.6 21h-3.2L2.5 3z"/></svg>
+      </button>
     </div>
   </aside>
 
@@ -88,7 +95,7 @@ function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
     (function() {
       // 1. Theme sync function
       function syncTheme(theme) {
-        var t = (theme === 'magazine' || theme === 'cards') ? 'magazine' : 'editorial';
+        var t = (theme === 'magazine' || theme === 'cards') ? 'magazine' : (theme === 'cyberdeck' ? 'cyberdeck' : 'editorial');
         document.documentElement.setAttribute('data-theme', t);
         try { localStorage.setItem('kh-theme', t); } catch(e) {}
 
@@ -414,6 +421,31 @@ const header = (home, archive, activePage = "home") => `
       </nav>
     </div>
   </div>
+
+  <div class="site-header-cyber-masthead">
+    <div class="cyber-masthead-main">
+      <div class="cyber-brand">
+        <a class="cyber-logo" href="${home}"><span class="cyber-prompt-sym">&gt;</span> KH_FIELD_NOTES<span class="cyber-cursor">_</span></a>
+        <span class="cyber-status-pill">● ONLINE // NETRUNNER_V3.0</span>
+      </div>
+      <div class="cyber-sys-info">
+        <span>LOC: [NET_NODE_0x7F]</span>
+        <span>SYS: [NOMINAL]</span>
+      </div>
+    </div>
+
+    <div class="cyber-bar-primary">
+      <div class="cyber-bar-left">
+        <span class="cyber-cli-prompt">root@kh-notes:~$</span>
+        <span class="cyber-cli-cmd">${activePage === "home" ? "ls -la ./stories" : (activePage === "archive" ? "cat ./archive" : "view ./article")}</span>
+      </div>
+      <nav class="cyber-nav-links" aria-label="深潜终端导航">
+        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">[./STORIES]</a>
+        <a href="${archive}" class="${activePage === "archive" ? "is-current" : ""}">[./ARCHIVE]</a>
+        <a href="https://github.com/KhalilHsu" target="_blank" rel="noopener noreferrer">[./GITHUB ↗]</a>
+      </nav>
+    </div>
+  </div>
 </header>`;
 
 const postItem = (post, prefix, mediaPrefix) => `
@@ -571,15 +603,16 @@ video {
 }
 
 /* ==========================================================================
-   Collapsible & Expandable Floating Theme Dock (Pure & Elegant)
+   Floating Theme Dock (Precision Unified Segmented Control)
    ========================================================================== */
 .floating-theme-dock {
   position: fixed;
   z-index: 99999;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 6px 4px 8px;
+  gap: 3px;
+  padding: 3px 5px;
+  height: 38px;
   border-radius: 9999px;
   user-select: none;
   -webkit-user-select: none;
@@ -589,7 +622,8 @@ video {
   box-sizing: border-box;
   width: fit-content;
   max-width: calc(100vw - 36px);
-  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  border: 1.5px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .floating-theme-dock.is-dragging {
@@ -604,89 +638,63 @@ video {
   opacity: 0.45;
   color: currentColor;
   cursor: grab;
-  padding: 6px 6px;
+  padding: 6px 4px 6px 5px;
   border-radius: 9999px;
   transition: opacity 0.2s ease, background-color 0.2s ease;
   flex-shrink: 0;
 }
 
 .dock-handle:hover {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.08);
+  opacity: 0.9;
+  background: rgba(128, 128, 128, 0.15);
 }
 
 .floating-theme-dock.is-dragging .dock-handle {
   cursor: grabbing;
   opacity: 1;
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(128, 128, 128, 0.2);
 }
 
 .theme-switcher {
   display: inline-flex;
   align-items: center;
-  padding: 3px;
+  padding: 2px;
   border-radius: 9999px;
   gap: 2px;
   white-space: nowrap;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .theme-seg-btn {
   border: none;
   background: transparent;
-  font: 500 12.5px/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: inherit;
   border-radius: 9999px;
   cursor: pointer;
-  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  
-  /* Smooth natural width collapse & expansion */
-  transition: max-width 0.26s cubic-bezier(0.2, 0, 0, 1),
-              padding 0.26s cubic-bezier(0.2, 0, 0, 1),
-              margin 0.26s cubic-bezier(0.2, 0, 0, 1),
-              opacity 0.2s ease,
-              background-color 0.2s ease,
-              color 0.2s ease,
-              box-shadow 0.2s ease;
-  overflow: hidden;
+  width: 32px;
+  height: 26px;
+  padding: 0;
+  opacity: 0.45;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-/* 1. COLLAPSED STATE (Default view): Non-active button folds away */
-.floating-theme-dock:not(.is-expanded) .theme-seg-btn:not(.active) {
-  max-width: 0;
-  padding-left: 0;
-  padding-right: 0;
-  margin-left: 0;
-  margin-right: 0;
-  opacity: 0;
+.theme-seg-btn:hover {
+  opacity: 0.85;
+}
+
+.theme-seg-btn.active {
+  opacity: 1;
+}
+
+.theme-seg-btn svg {
+  display: block;
   pointer-events: none;
-}
-
-.floating-theme-dock .theme-seg-btn.active {
-  max-width: 140px;
-  padding: 6px 14px;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* 2. EXPANDED STATE (Active when .is-expanded is present on the dock) */
-.floating-theme-dock.is-expanded .theme-seg-btn {
-  max-width: 140px;
-  padding: 6px 14px;
-  opacity: 0.65;
-  pointer-events: auto;
-}
-
-.floating-theme-dock.is-expanded .theme-seg-btn:hover {
-  opacity: 1;
-}
-
-.floating-theme-dock.is-expanded .theme-seg-btn.active {
-  opacity: 1;
-  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -719,7 +727,8 @@ html[data-theme="editorial"] .site-header-editorial-bar {
   justify-content: space-between;
 }
 
-html[data-theme="editorial"] .site-header-mag-masthead {
+html[data-theme="editorial"] .site-header-mag-masthead,
+html[data-theme="editorial"] .site-header-cyber-masthead {
   display: none;
 }
 
@@ -1028,13 +1037,14 @@ html[data-theme="editorial"] .floating-theme-dock {
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
   color: #20201e;
 }
 
 html[data-theme="editorial"] .floating-theme-dock .theme-switcher {
   background: rgba(0, 0, 0, 0.05);
+  border-color: transparent;
 }
 
 html[data-theme="editorial"] .floating-theme-dock .theme-seg-btn.active {
@@ -1069,9 +1079,11 @@ html[data-theme="cards"] body {
   background: #ffffff;
 }
 
-/* Hide editorial masthead in Magazine mode */
+/* Hide other mastheads in Magazine mode */
 html[data-theme="magazine"] .site-header-editorial-bar,
-html[data-theme="cards"] .site-header-editorial-bar {
+html[data-theme="cards"] .site-header-editorial-bar,
+html[data-theme="magazine"] .site-header-cyber-masthead,
+html[data-theme="cards"] .site-header-cyber-masthead {
   display: none;
 }
 
@@ -1631,28 +1643,613 @@ html[data-theme="cards"] .back:hover {
 html[data-theme="magazine"] .floating-theme-dock,
 html[data-theme="cards"] .floating-theme-dock {
   background: #ffffff;
-  border: 2px solid #000000;
-  box-shadow: 4px 4px 0 #000000;
+  border-color: #000000;
+  box-shadow: 3px 3px 0 #000000;
   color: #000000;
 }
 
 html[data-theme="magazine"] .floating-theme-dock .theme-switcher,
 html[data-theme="cards"] .floating-theme-dock .theme-switcher {
   background: #f0f0f0;
-  border: 1.5px solid #000000;
+  border-color: #000000;
 }
 
 html[data-theme="magazine"] .floating-theme-dock .theme-seg-btn.active,
 html[data-theme="cards"] .floating-theme-dock .theme-seg-btn.active {
   background: #000000;
   color: #ffffff;
-  font-weight: 700;
   box-shadow: none;
 }
 
 html[data-theme="magazine"] .floating-theme-dock.is-dragging,
 html[data-theme="cards"] .floating-theme-dock.is-dragging {
   box-shadow: 7px 7px 0 #000000;
+}
+
+/* ==========================================================================
+   THEME 3: Cyberdeck / Netrunner (深潜终端 · 黑客代码流)
+   ========================================================================== */
+html[data-theme="cyberdeck"] {
+  --cyber-bg: #050807;
+  --cyber-surface: #090e0b;
+  --cyber-surface-hover: #0e1612;
+  --cyber-green: #00ff66;
+  --cyber-green-dim: #00cc52;
+  --cyber-green-glow: rgba(0, 255, 102, 0.35);
+  --cyber-cyan: #05d9e8;
+  --cyber-cyan-glow: rgba(5, 217, 232, 0.35);
+  --cyber-heading: #d0edd9;
+  --cyber-text: #b2d4c2;
+  --cyber-muted: #5e8a70;
+  --cyber-border: 1px solid rgba(0, 255, 102, 0.25);
+  --cyber-border-bright: 1.5px solid #00ff66;
+  --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, Monaco, Consolas, monospace;
+  background: var(--cyber-bg);
+  background-image: 
+    linear-gradient(rgba(0, 255, 102, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 102, 0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+html[data-theme="cyberdeck"] body {
+  color: var(--cyber-text);
+  font-family: var(--font-mono);
+  background: transparent;
+}
+
+/* Hide other headers in Cyberdeck mode */
+html[data-theme="cyberdeck"] .site-header-editorial-bar,
+html[data-theme="cyberdeck"] .site-header-mag-masthead {
+  display: none;
+}
+
+/* Cyberdeck Masthead */
+html[data-theme="cyberdeck"] .site-header {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 24px 0;
+}
+
+html[data-theme="cyberdeck"] .site-header-cyber-masthead {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+html[data-theme="cyberdeck"] .cyber-masthead-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(0, 255, 102, 0.3);
+}
+
+html[data-theme="cyberdeck"] .cyber-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+html[data-theme="cyberdeck"] .cyber-logo {
+  font-family: var(--font-mono);
+  font-size: clamp(22px, 3.5vw, 32px);
+  font-weight: 800;
+  color: var(--cyber-green);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 10px var(--cyber-green-glow);
+}
+
+html[data-theme="cyberdeck"] .cyber-prompt-sym {
+  color: var(--cyber-cyan);
+}
+
+html[data-theme="cyberdeck"] .cyber-cursor {
+  animation: cyberBlink 1s infinite steps(2, start);
+  color: var(--cyber-green);
+}
+
+@keyframes cyberBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+html[data-theme="cyberdeck"] .cyber-status-pill {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  background: rgba(0, 255, 102, 0.12);
+  border: 1px solid var(--cyber-green);
+  color: var(--cyber-green);
+  border-radius: 2px;
+  text-shadow: 0 0 6px var(--cyber-green-glow);
+}
+
+html[data-theme="cyberdeck"] .cyber-sys-info {
+  display: flex;
+  gap: 18px;
+  font-size: 11.5px;
+  color: var(--cyber-muted);
+  letter-spacing: 0.05em;
+}
+
+html[data-theme="cyberdeck"] .cyber-bar-primary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--cyber-surface);
+  border: var(--cyber-border);
+  padding: 10px 18px;
+  border-left: 4px solid var(--cyber-green);
+  box-shadow: inset 0 0 15px rgba(0, 255, 102, 0.04);
+}
+
+html[data-theme="cyberdeck"] .cyber-cli-prompt {
+  color: var(--cyber-cyan);
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+html[data-theme="cyberdeck"] .cyber-cli-cmd {
+  color: var(--cyber-green);
+  font-size: 13.5px;
+  margin-left: 6px;
+}
+
+html[data-theme="cyberdeck"] .cyber-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+html[data-theme="cyberdeck"] .cyber-nav-links a {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: var(--cyber-muted);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  padding: 3px 6px;
+}
+
+html[data-theme="cyberdeck"] .cyber-nav-links a:hover,
+html[data-theme="cyberdeck"] .cyber-nav-links a.is-current {
+  color: var(--cyber-green);
+  background: rgba(0, 255, 102, 0.12);
+  text-shadow: 0 0 8px var(--cyber-green-glow);
+}
+
+/* Page Intro in Cyberdeck mode */
+html[data-theme="cyberdeck"] .page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+}
+
+html[data-theme="cyberdeck"] .page-intro-editorial {
+  border-left: 3px solid var(--cyber-green);
+  background: rgba(0, 255, 102, 0.04);
+  padding: 20px 24px;
+  margin-bottom: 36px;
+  border-top: 1px solid rgba(0, 255, 102, 0.15);
+  border-right: 1px solid rgba(0, 255, 102, 0.15);
+  border-bottom: 1px solid rgba(0, 255, 102, 0.15);
+}
+
+html[data-theme="cyberdeck"] .page-intro-editorial .eyebrow {
+  color: var(--cyber-cyan);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+html[data-theme="cyberdeck"] .page-intro-editorial h1 {
+  color: var(--cyber-heading);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+  margin: 8px 0 10px;
+  letter-spacing: -0.01em;
+}
+
+html[data-theme="cyberdeck"] .page-intro-editorial .intro {
+  color: var(--cyber-muted);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+/* Post list grid in Cyberdeck mode */
+html[data-theme="cyberdeck"] .post-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+  border: none;
+}
+
+html[data-theme="cyberdeck"] .post-item {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  background: var(--cyber-surface);
+  border: 1px solid rgba(0, 255, 102, 0.25);
+  border-left: 3px solid var(--cyber-green);
+  box-shadow: 0 0 15px rgba(0, 255, 102, 0.03);
+  padding: 16px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: auto;
+}
+
+/* Whole card clickable link overlay */
+html[data-theme="cyberdeck"] .post-item h2 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+html[data-theme="cyberdeck"] .post-item:hover {
+  border-color: var(--cyber-green);
+  box-shadow: 0 0 20px rgba(0, 255, 102, 0.18), inset 0 0 15px rgba(0, 255, 102, 0.05);
+  transform: translateY(-3px);
+  background: var(--cyber-surface-hover);
+}
+
+/* Hover on card highlights title to glowing green */
+html[data-theme="cyberdeck"] .post-item:hover h2 a {
+  color: var(--cyber-green);
+  text-shadow: 0 0 10px var(--cyber-green-glow);
+}
+
+html[data-theme="cyberdeck"] .list-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+  margin-bottom: 14px;
+  border: 1px solid rgba(0, 255, 102, 0.2);
+}
+
+html[data-theme="cyberdeck"] .cover-frame {
+  width: 100%;
+  height: 100%;
+}
+
+html[data-theme="cyberdeck"] .cover-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+  filter: contrast(1.1) saturate(0.9);
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+html[data-theme="cyberdeck"] .post-item:hover .cover-frame img {
+  opacity: 1;
+  filter: contrast(1.15) saturate(1.1);
+}
+
+html[data-theme="cyberdeck"] .post-copy {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+html[data-theme="cyberdeck"] .post-date-bottom,
+html[data-theme="cyberdeck"] .post-tags-container .tag {
+  display: none;
+}
+
+html[data-theme="cyberdeck"] .post-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+html[data-theme="cyberdeck"] .post-date-dot {
+  font-size: 11.5px;
+  color: var(--cyber-cyan);
+  letter-spacing: 0.05em;
+}
+
+html[data-theme="cyberdeck"] .post-date-badge {
+  display: none;
+}
+
+html[data-theme="cyberdeck"] .tag-badges {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+html[data-theme="cyberdeck"] .tag-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: rgba(0, 255, 102, 0.1);
+  color: var(--cyber-green);
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+}
+
+html[data-theme="cyberdeck"] .post-item h2 {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+}
+
+html[data-theme="cyberdeck"] .post-item h2 a {
+  color: var(--cyber-heading);
+  text-decoration: none;
+  transition: color 0.15s ease, text-shadow 0.15s ease;
+}
+
+html[data-theme="cyberdeck"] .summary {
+  font-size: 13.5px;
+  color: var(--cyber-muted);
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+
+html[data-theme="cyberdeck"] .summary::before {
+  content: "> ";
+  color: var(--cyber-green);
+}
+
+/* Archive in Cyberdeck mode */
+html[data-theme="cyberdeck"] .archive-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+  border-top: none;
+}
+
+html[data-theme="cyberdeck"] .archive-item {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  background: var(--cyber-surface);
+  border: 1px solid rgba(0, 255, 102, 0.2);
+  border-left: 3px solid var(--cyber-cyan);
+  padding: 12px 18px;
+  transition: all 0.15s ease;
+}
+
+html[data-theme="cyberdeck"] .archive-item:hover {
+  border-color: var(--cyber-green);
+  background: var(--cyber-surface-hover);
+  box-shadow: 0 0 15px rgba(0, 255, 102, 0.15);
+  transform: translateX(4px);
+}
+
+html[data-theme="cyberdeck"] .archive-date {
+  color: var(--cyber-cyan);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+
+html[data-theme="cyberdeck"] .archive-title {
+  color: var(--cyber-heading);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+html[data-theme="cyberdeck"] .archive-item:hover .archive-title {
+  color: var(--cyber-green);
+  text-shadow: 0 0 8px var(--cyber-green-glow);
+}
+
+html[data-theme="cyberdeck"] .archive-tag-raw { display: none; }
+html[data-theme="cyberdeck"] .archive-tag-badges { display: flex; gap: 6px; }
+
+html[data-theme="cyberdeck"] .archive-link {
+  margin-top: 36px;
+}
+
+html[data-theme="cyberdeck"] .archive-link a {
+  display: inline-block;
+  background: var(--cyber-surface);
+  border: 1px solid var(--cyber-green);
+  color: var(--cyber-green);
+  padding: 8px 18px;
+  text-decoration: none;
+  font-size: 13.5px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
+  transition: all 0.15s ease;
+}
+
+html[data-theme="cyberdeck"] .archive-link a:hover {
+  background: var(--cyber-green);
+  color: #040706;
+  font-weight: 700;
+  box-shadow: 0 0 20px var(--cyber-green);
+}
+
+/* Article detail in Cyberdeck mode */
+html[data-theme="cyberdeck"] .article {
+  max-width: 1180px;
+  margin: 32px auto 96px;
+  padding: 0 24px;
+}
+
+html[data-theme="cyberdeck"] .article-meta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed rgba(0, 255, 102, 0.3);
+  padding-bottom: 14px;
+  margin-bottom: 24px;
+}
+
+html[data-theme="cyberdeck"] .article-meta-header .tag { display: none; }
+
+html[data-theme="cyberdeck"] .article-date {
+  color: var(--cyber-cyan);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+html[data-theme="cyberdeck"] .article h1 {
+  color: var(--cyber-heading);
+  font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin: 0 0 20px;
+  text-shadow: 0 0 16px rgba(0, 255, 102, 0.15);
+}
+
+html[data-theme="cyberdeck"] .lead {
+  background: rgba(0, 255, 102, 0.05);
+  border-left: 4px solid var(--cyber-green);
+  border-top: 1px solid rgba(0, 255, 102, 0.15);
+  border-right: 1px solid rgba(0, 255, 102, 0.15);
+  border-bottom: 1px solid rgba(0, 255, 102, 0.15);
+  padding: 16px 20px;
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: #a4cfb7;
+  margin: 0 0 40px;
+}
+
+html[data-theme="cyberdeck"] .article-body {
+  max-width: 960px;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--cyber-text);
+}
+
+html[data-theme="cyberdeck"] .article-body p {
+  margin: 0 0 1.6em;
+}
+
+html[data-theme="cyberdeck"] .article-body figure {
+  margin: 2.5em 0;
+  border: 1px solid rgba(0, 255, 102, 0.35);
+  border-radius: 4px;
+  background: #000;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 255, 102, 0.08);
+}
+
+html[data-theme="cyberdeck"] .article-body img,
+html[data-theme="cyberdeck"] .article-body video {
+  width: 100%;
+  display: block;
+}
+
+html[data-theme="cyberdeck"] .article-body figcaption {
+  padding: 8px 14px;
+  background: #090e0b;
+  color: var(--cyber-green);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  border-top: 1px solid rgba(0, 255, 102, 0.25);
+}
+
+html[data-theme="cyberdeck"] .article-body code {
+  background: #0d1a13;
+  color: var(--cyber-green);
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+html[data-theme="cyberdeck"] .article-body pre {
+  background: #040806;
+  border: 1px solid rgba(0, 255, 102, 0.35);
+  border-left: 4px solid var(--cyber-green);
+  padding: 18px 22px;
+  border-radius: 4px;
+  box-shadow: 0 0 20px rgba(0, 255, 102, 0.08), inset 0 0 15px rgba(0, 0, 0, 0.8);
+  margin: 2em 0;
+}
+
+html[data-theme="cyberdeck"] .article-body pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--cyber-green);
+  font-size: 13.5px;
+}
+
+html[data-theme="cyberdeck"] .article-body a {
+  color: var(--cyber-cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: all 0.15s ease;
+}
+
+html[data-theme="cyberdeck"] .article-body a:hover {
+  color: var(--cyber-green);
+  text-shadow: 0 0 8px var(--cyber-green-glow);
+}
+
+html[data-theme="cyberdeck"] .back {
+  display: inline-block;
+  margin-top: 48px;
+  background: var(--cyber-surface);
+  border: 1px solid var(--cyber-green);
+  color: var(--cyber-green);
+  padding: 8px 18px;
+  text-decoration: none;
+  font-size: 13.5px;
+  letter-spacing: 0.05em;
+  transition: all 0.15s ease;
+}
+
+html[data-theme="cyberdeck"] .back:hover {
+  background: var(--cyber-green);
+  color: #040706;
+  font-weight: 700;
+  box-shadow: 0 0 15px var(--cyber-green);
+}
+
+/* Floating theme dock in Cyberdeck mode */
+html[data-theme="cyberdeck"] .floating-theme-dock {
+  background: rgba(5, 12, 8, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: var(--cyber-green);
+  box-shadow: 0 0 25px rgba(0, 255, 102, 0.3), 0 8px 30px rgba(0, 0, 0, 0.8);
+  color: var(--cyber-green);
+}
+
+html[data-theme="cyberdeck"] .floating-theme-dock .dock-handle {
+  color: var(--cyber-green);
+}
+
+html[data-theme="cyberdeck"] .floating-theme-dock .dock-handle:hover {
+  background: rgba(0, 255, 102, 0.15);
+}
+
+html[data-theme="cyberdeck"] .floating-theme-dock .theme-switcher {
+  background: rgba(0, 255, 102, 0.08);
+  border-color: rgba(0, 255, 102, 0.25);
+}
+
+html[data-theme="cyberdeck"] .floating-theme-dock .theme-seg-btn {
+  color: var(--cyber-green);
+}
+
+html[data-theme="cyberdeck"] .floating-theme-dock .theme-seg-btn.active {
+  background: var(--cyber-green);
+  color: #040706;
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.6);
+}
+
+html[data-theme="cyberdeck"] .floating-theme-dock.is-dragging {
+  box-shadow: 0 0 35px rgba(0, 255, 102, 0.5);
 }
 
 /* ==========================================================================
@@ -1698,6 +2295,23 @@ html[data-theme="cards"] .floating-theme-dock.is-dragging {
   html[data-theme="cards"] .archive-item {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+  html[data-theme="cyberdeck"] .post-list {
+    grid-template-columns: 1fr;
+  }
+  html[data-theme="cyberdeck"] .cyber-masthead-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  html[data-theme="cyberdeck"] .cyber-bar-primary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  html[data-theme="cyberdeck"] .archive-item {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 }
 
