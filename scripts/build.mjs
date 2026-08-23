@@ -1156,24 +1156,25 @@ html[data-theme="cards"] .page {
   padding: 32px 24px 80px;
 }
 
-/* Multi-column dense card grid */
+/* Masonry column layout — items flow vertically, no forced row alignment */
 html[data-theme="magazine"] .post-list,
 html[data-theme="cards"] .post-list {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 36px 20px;
+  column-count: 4;
+  column-gap: 20px;
   margin-top: 16px;
   border: none;
 }
 
 html[data-theme="magazine"] .post-item,
 html[data-theme="cards"] .post-item {
-  display: flex;
-  flex-direction: column;
+  display: inline-block;
+  width: 100%;
+  break-inside: avoid;
   background: #ffffff;
   padding: 0;
   border: none;
   min-height: 0;
+  margin-bottom: 28px;
 }
 
 /* Colorful Frame Variations */
@@ -1188,7 +1189,6 @@ html[data-theme="cards"] .list-cover {
 html[data-theme="magazine"] .cover-frame,
 html[data-theme="cards"] .cover-frame {
   width: 100%;
-  aspect-ratio: 1 / 1;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -1205,8 +1205,8 @@ html[data-theme="cards"] .post-item:hover .cover-frame {
 html[data-theme="magazine"] .cover-frame img,
 html[data-theme="cards"] .cover-frame img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
 }
 
 /* Frame color scheme mapping */
@@ -1215,7 +1215,6 @@ html[data-theme="magazine"] .post-item:nth-child(8n + 1) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 1) .cover-frame {
   border-radius: 999px 999px 999px 999px;
   background: #eae6df;
-  aspect-ratio: 4 / 3;
 }
 
 /* Card 2: Bright Orange frame */
@@ -1228,7 +1227,6 @@ html[data-theme="cards"] .post-item:nth-child(8n + 2) .cover-frame {
 html[data-theme="magazine"] .post-item:nth-child(8n + 3) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 3) .cover-frame {
   border: 1px solid #111111;
-  aspect-ratio: 16 / 11;
 }
 
 /* Card 4: Olive Green frame */
@@ -1625,7 +1623,7 @@ html[data-theme="cards"] .floating-theme-dock.is-dragging {
 @media (max-width: 1024px) {
   html[data-theme="magazine"] .post-list,
   html[data-theme="cards"] .post-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-count: 3;
   }
 }
 
@@ -1655,8 +1653,8 @@ html[data-theme="cards"] .floating-theme-dock.is-dragging {
   }
   html[data-theme="magazine"] .post-list,
   html[data-theme="cards"] .post-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px 16px;
+    column-count: 2;
+    column-gap: 16px;
   }
   html[data-theme="magazine"] .archive-item,
   html[data-theme="cards"] .archive-item {
@@ -1668,7 +1666,7 @@ html[data-theme="cards"] .floating-theme-dock.is-dragging {
 @media (max-width: 480px) {
   html[data-theme="magazine"] .post-list,
   html[data-theme="cards"] .post-list {
-    grid-template-columns: 1fr;
+    column-count: 1;
   }
 }
 `;
