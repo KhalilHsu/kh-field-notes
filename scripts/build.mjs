@@ -80,13 +80,13 @@ function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
     
     <div class="theme-switcher" role="radiogroup" aria-label="主题切换">
       <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" title="经典报刊 (Editorial)" aria-label="经典报刊">
-        <svg width="13" height="13" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true"><rect x="18.5" y="16" width="7.5" height="32" rx="1.5"/><polygon points="26,33 35.5,16 45,16 32,36"/><polygon points="30.5,31 45.5,48 36,48 24.5,35"/></svg>
+        <svg width="14.5" height="14.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5L12.5 3.5c.8-1.5 2.8-1 2.8.8 0 3.6-3.2 10.6-4.5 15.2"/><path d="M10.8 12c1.6-1.5 4.5-1.5 4.6 1 .2 2.2-2.2 2.8-4.2 2.8 2.5.5 5.5 1.2 8.5 2.5"/></svg>
       </button>
       <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" title="画报潮流 (Magazine)" aria-label="画报潮流">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="16" y2="7"/><line x1="9" y1="11" x2="14" y2="11"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.2 4h3.8l5 9.4 5-9.4h3.8v16h-3.4V8.5l-4.4 8.2h-2L6.6 8.5V20H3.2V4z"/></svg>
       </button>
       <button type="button" class="theme-seg-btn" data-theme-val="cyberdeck" role="radio" title="深潜终端 (Cyberdeck)" aria-label="深潜终端">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.5 3h4.2l5.3 13.2L17.3 3h4.2L13.6 21h-3.2L2.5 3z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.2 4h3.8l5 13.2L17 4h3.8L13.8 20h-3.6L3.2 4z"/></svg>
       </button>
     </div>
   </aside>
