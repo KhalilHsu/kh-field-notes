@@ -1224,22 +1224,22 @@ html[data-theme="cards"] .page {
 /* Masonry column layout — items flow vertically, no forced row alignment */
 html[data-theme="magazine"] .post-list,
 html[data-theme="cards"] .post-list {
-  column-count: 4;
-  column-gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px 20px;
   margin-top: 16px;
   border: none;
 }
 
 html[data-theme="magazine"] .post-item,
 html[data-theme="cards"] .post-item {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  break-inside: avoid;
   background: #ffffff;
   padding: 0;
   border: none;
   min-height: 0;
-  margin-bottom: 28px;
 }
 
 /* Colorful Frame Variations */
@@ -2277,7 +2277,7 @@ html[data-theme="cyberdeck"] .floating-theme-dock.is-dragging {
 @media (max-width: 1024px) {
   html[data-theme="magazine"] .post-list,
   html[data-theme="cards"] .post-list {
-    column-count: 3;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -2307,8 +2307,8 @@ html[data-theme="cyberdeck"] .floating-theme-dock.is-dragging {
   }
   html[data-theme="magazine"] .post-list,
   html[data-theme="cards"] .post-list {
-    column-count: 2;
-    column-gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 16px;
   }
   html[data-theme="magazine"] .archive-item,
   html[data-theme="cards"] .archive-item {
@@ -2337,7 +2337,7 @@ html[data-theme="cyberdeck"] .floating-theme-dock.is-dragging {
 @media (max-width: 480px) {
   html[data-theme="magazine"] .post-list,
   html[data-theme="cards"] .post-list {
-    column-count: 1;
+    grid-template-columns: 1fr;
   }
 }
 `;
