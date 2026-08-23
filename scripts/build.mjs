@@ -1441,7 +1441,7 @@ html[data-theme="cards"] .archive-link a:hover {
 /* Article detail Magazine Mode */
 html[data-theme="magazine"] .article,
 html[data-theme="cards"] .article {
-  max-width: 960px;
+  max-width: 1240px;
   margin: 28px auto 96px;
   padding: 0 24px;
 }
