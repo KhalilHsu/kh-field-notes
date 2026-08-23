@@ -1,6 +1,6 @@
 ---
 title: 我给 macOS 的外链分流写了个分流器
-date: 2026-08-23
+date: 2026-04-16
 tags: MACOS / TOOLS / SWIFT
 summary: 把工作、个人、OAuth 与测试账号彻底隔开，不用再在错的浏览器里反复复制粘贴。
 cover: media/browser-router-cover.png

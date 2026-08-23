@@ -398,6 +398,7 @@ const header = (home, archive, activePage = "home") => `
     <nav class="nav-editorial" aria-label="主导航">
       <a href="${home}" class="${activePage === "home" ? "is-active" : ""}">文章</a>
       <a href="${archive}" class="${activePage === "archive" ? "is-active" : ""}">归档</a>
+      <a href="https://github.com/KhalilHsu" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </nav>
   </div>
 
