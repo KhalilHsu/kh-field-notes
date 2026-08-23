@@ -129,14 +129,17 @@ function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
       var dock = document.getElementById('themeDock');
       if (!dock) return;
 
-      // Expand dock on hover over either switcher or entire dock
-      dock.addEventListener('mouseenter', function() {
-        if (!isDragging) {
-          dock.classList.add('is-expanded');
-        }
-      });
+      var switcher = dock.querySelector('.theme-switcher');
+      if (switcher) {
+        // 1. 划入分段器本体时才展开（划到可拖拽把手区域时不展开）
+        switcher.addEventListener('mouseenter', function() {
+          if (!isDragging) {
+            dock.classList.add('is-expanded');
+          }
+        });
+      }
 
-      // Collapse dock back to only active button when leaving dock area
+      // 2. 离开整个 Dock 区域（包括分段器本体和拖拽把手）时才收起
       dock.addEventListener('mouseleave', function() {
         if (!isDragging) {
           dock.classList.remove('is-expanded');
