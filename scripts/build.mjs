@@ -564,6 +564,7 @@ const css = `
 }
 
 html {
+  overflow-y: scroll;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
