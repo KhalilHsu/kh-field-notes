@@ -3,7 +3,7 @@ title: 我给我的本地 Agent 倒上了一杯卡布奇诺
 date: 2026-08-24
 tags: MACOS / AGENT / TOOLS / SWIFT
 summary: 防休眠、定时恢复与黑屏保帧，给跑通宵的本地 Agent 倒上一杯清醒的咖啡。
-cover: media/keepawake-menubar.png
+cover: media/coffee-or-tea-cover.png
 ---
 
 自从把越来越多繁重的工作交给本地 Agent 和后台自动化流水线之后，我的 Mac 迎来了一个新的常态：即使我离开了书桌，它依然在全速运转。
@@ -20,7 +20,7 @@ cover: media/keepawake-menubar.png
 
 为了给后台任务和本地 Agent 一个最轻快、最让人放心的运行环境，我写了这个原生的 macOS 菜单栏小工具：[KeepAwake（CoffeeORTea）](https://github.com/KhalilHsu/CoffeeORTea)。
 
-![KeepAwake 菜单栏原生交互界面](media/keepawake-menubar.png)
+![KeepAwake 原生菜单栏与防休眠控制面板](media/coffee-or-tea-cover.png)
 
 它的核心逻辑非常纯粹：像给 Mac 倒了一杯咖啡一样，一键让系统保持清醒；不需要时，轻轻一拨恢复正常的系统节律。
 

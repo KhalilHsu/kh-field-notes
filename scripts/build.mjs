@@ -780,7 +780,7 @@ html[data-theme="editorial"] body {
 
 /* Header Editorial mode */
 html[data-theme="editorial"] .site-header {
-  max-width: 1080px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 32px 28px 24px;
   border-bottom: 1px solid var(--rule);
@@ -824,7 +824,7 @@ html[data-theme="editorial"] .nav-editorial a.is-active {
 
 /* Page Editorial mode */
 html[data-theme="editorial"] .page {
-  max-width: 1080px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 72px 28px 96px;
 }
@@ -985,7 +985,7 @@ html[data-theme="editorial"] .archive-link a:hover {
 
 /* Article detail Editorial mode */
 html[data-theme="editorial"] .article {
-  max-width: 1080px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 72px 28px 96px;
 }
@@ -1017,11 +1017,11 @@ html[data-theme="editorial"] .lead {
   font-size: 21px;
   line-height: 1.65;
   color: #4a4945;
-  max-width: 920px;
+  max-width: 100%;
 }
 
 html[data-theme="editorial"] .article-body {
-  max-width: 900px;
+  max-width: 100%;
   font-size: 19px;
   line-height: 1.8;
 }
@@ -1772,7 +1772,7 @@ html[data-theme="cyberdeck"] .site-header-mag-masthead {
 
 /* Cyberdeck Masthead */
 html[data-theme="cyberdeck"] .site-header {
-  max-width: 1180px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 24px 24px 0;
 }
@@ -1887,7 +1887,7 @@ html[data-theme="cyberdeck"] .cyber-nav-links a.is-current {
 
 /* Page Intro in Cyberdeck mode */
 html[data-theme="cyberdeck"] .page {
-  max-width: 1180px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 36px 24px 80px;
 }
@@ -1970,7 +1970,7 @@ html[data-theme="cyberdeck"] .post-item:hover h2 a {
 html[data-theme="cyberdeck"] .list-cover {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
   background: #000;
   margin-bottom: 14px;
@@ -2143,7 +2143,7 @@ html[data-theme="cyberdeck"] .archive-link a:hover {
 
 /* Article detail in Cyberdeck mode */
 html[data-theme="cyberdeck"] .article {
-  max-width: 1180px;
+  max-width: 960px;
   margin: 32px auto 96px;
   padding: 0 24px;
 }
@@ -2189,7 +2189,7 @@ html[data-theme="cyberdeck"] .lead {
 }
 
 html[data-theme="cyberdeck"] .article-body {
-  max-width: 960px;
+  max-width: 100%;
   font-size: 16px;
   line-height: 1.85;
   color: var(--cyber-text);
@@ -2357,7 +2357,7 @@ html[data-theme="cyberdeck"] .floating-theme-dock.is-dragging {
     gap: 14px;
   }
   html[data-theme="editorial"] .list-cover {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 3 / 2;
   }
   html[data-theme="editorial"] .archive-item span {
     display: none;

@@ -3,6 +3,7 @@ title: 我为 DeepSeek Harness 写了两个插件
 date: 2026-08-21
 tags: AI / AGENT / TOOLS
 summary: 原汤化原食，为 DeepSeek Harness 补齐两处交互细节。
+cover: media/dsh-plugins-cover.png
 ---
 
 DeepSeek Harness 开源后，我直接接入 DeepSeek V4 / V4 Pro 的 API 搭起来体验了一下。出发点很简单：原汤化原食，看看它的原生工程能力到底如何。
