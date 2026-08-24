@@ -1259,11 +1259,8 @@ html[data-theme="cards"] .list-cover {
 html[data-theme="magazine"] .cover-frame,
 html[data-theme="cards"] .cover-frame {
   width: 100%;
-  aspect-ratio: 3 / 2;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   background: #f4f4f4;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1276,9 +1273,7 @@ html[data-theme="cards"] .post-item:hover .cover-frame {
 html[data-theme="magazine"] .cover-frame img,
 html[data-theme="cards"] .cover-frame img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  height: auto;
   display: block;
 }
 
