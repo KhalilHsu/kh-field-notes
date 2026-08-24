@@ -260,7 +260,7 @@ function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
             x: targetX,
             y: targetY,
             ratioX: winW > 0 ? targetX / winW : 0.9,
-            ratioY: winH > 0 ? targetY / winH : 0.05
+            ratioY: winH > 0 ? targetY / winH : 0.9
           }));
         } catch(e) {}
       }
@@ -277,10 +277,10 @@ function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
         var minY = MARGIN;
         var maxY = Math.max(MARGIN, winH - dockH - MARGIN);
 
-        // Default top-right position (24px from top, 18px from right edge)
-        var initEdge = 'right';
+        // Default bottom-right position (18px from right, 18px from bottom)
+        var initEdge = 'bottom';
         var initX = maxX;
-        var initY = clamp(24, minY, maxY);
+        var initY = maxY;
 
         try {
           var saved = JSON.parse(localStorage.getItem('kh-dock-pos'));
@@ -816,15 +816,16 @@ html[data-theme="editorial"] .post-list {
 html[data-theme="editorial"] .post-item {
   display: grid;
   grid-template-columns: 350px 1fr;
+  align-items: start;
   gap: 36px;
-  min-height: 220px;
   padding: 28px 0 32px;
   border-bottom: 1px solid var(--rule);
 }
 
 html[data-theme="editorial"] .list-cover {
   display: block;
-  align-self: stretch;
+  width: 100%;
+  aspect-ratio: 3 / 2;
   background: #eeece7;
   overflow: hidden;
   border-radius: 2px;
@@ -839,6 +840,8 @@ html[data-theme="editorial"] .list-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 html[data-theme="editorial"] .post-copy {
@@ -1227,6 +1230,7 @@ html[data-theme="magazine"] .post-list,
 html[data-theme="cards"] .post-list {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  align-items: start;
   gap: 28px 20px;
   margin-top: 16px;
   border: none;
@@ -1255,6 +1259,7 @@ html[data-theme="cards"] .list-cover {
 html[data-theme="magazine"] .cover-frame,
 html[data-theme="cards"] .cover-frame {
   width: 100%;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -1271,7 +1276,9 @@ html[data-theme="cards"] .post-item:hover .cover-frame {
 html[data-theme="magazine"] .cover-frame img,
 html[data-theme="cards"] .cover-frame img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   display: block;
 }
 
