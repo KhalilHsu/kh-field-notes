@@ -21,17 +21,36 @@ function paragraphize(body, imagePrefix) {
       const idx = parseInt(trimmed.replace("<!--CODEBLOCK_", "").replace("-->", ""), 10);
       return codeBlocks[idx];
     }
-    const media = trimmed.match(/^(?:@video|!)\[([^\]]*)\]\(([^)\s]+)\)$/i);
-    if (media) {
-      const alt = escapeHtml(media[1]);
-      const rawSrc = media[2];
-      const isExternal = /^https?:\/\//i.test(rawSrc);
-      const src = isExternal ? escapeHtml(rawSrc) : `${imagePrefix}${escapeHtml(rawSrc)}`;
-      const isVideo = trimmed.startsWith("@video") || /\.(mp4|mov|webm|m4v|ogg)$/i.test(rawSrc);
-      if (isVideo) {
-        return `<figure class="media-video"><video src="${src}" controls playsinline preload="metadata"></video>${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
+
+    const mediaMatches = [...trimmed.matchAll(/(?:@video|!)\[([^\]]*)\]\(([^)\s]+)\)/gi)];
+    const withoutMedia = trimmed.replace(/(?:@video|!)\[([^\]]*)\]\(([^)\s]+)\)/gi, "").trim();
+
+    if (mediaMatches.length > 0 && withoutMedia === "") {
+      if (mediaMatches.length === 1) {
+        const alt = escapeHtml(mediaMatches[0][1]);
+        const rawSrc = mediaMatches[0][2];
+        const isExternal = /^https?:\/\//i.test(rawSrc);
+        const src = isExternal ? escapeHtml(rawSrc) : `${imagePrefix}${escapeHtml(rawSrc)}`;
+        const isVideo = mediaMatches[0][0].startsWith("@video") || /\.(mp4|mov|webm|m4v|ogg)$/i.test(rawSrc);
+        if (isVideo) {
+          return `<figure class="media-video"><video src="${src}" controls playsinline preload="metadata"></video>${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
+        }
+        return `<figure class="media-image"><img src="${src}" alt="${alt}" loading="lazy">${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
       }
-      return `<figure class="media-image"><img src="${src}" alt="${alt}" loading="lazy">${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
+
+      const itemsHtml = mediaMatches.map((m) => {
+        const alt = escapeHtml(m[1]);
+        const rawSrc = m[2];
+        const isExternal = /^https?:\/\//i.test(rawSrc);
+        const src = isExternal ? escapeHtml(rawSrc) : `${imagePrefix}${escapeHtml(rawSrc)}`;
+        const isVideo = m[0].startsWith("@video") || /\.(mp4|mov|webm|m4v|ogg)$/i.test(rawSrc);
+        if (isVideo) {
+          return `<div class="media-grid-item"><video src="${src}" controls playsinline preload="metadata"></video>${alt ? `<figcaption>${alt}</figcaption>` : ""}</div>`;
+        }
+        return `<div class="media-grid-item"><img src="${src}" alt="${alt}" loading="lazy">${alt ? `<figcaption>${alt}</figcaption>` : ""}</div>`;
+      }).join("\n");
+
+      return `<figure class="media-grid media-grid-${mediaMatches.length}">\n${itemsHtml}\n</figure>`;
     }
 
     let html = escapeHtml(paragraph);
@@ -604,6 +623,32 @@ video {
   max-width: 100%;
   display: block;
 }
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .media-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.media-grid-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.media-grid-item img,
+.media-grid-item video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 
 /* ==========================================================================
    Floating Theme Dock (Precision Unified Segmented Control)
@@ -2156,6 +2201,21 @@ html[data-theme="cyberdeck"] .article-body p {
 
 html[data-theme="cyberdeck"] .article-body figure {
   margin: 2.5em 0;
+  border: 1px solid rgba(0, 255, 102, 0.35);
+  border-radius: 4px;
+  background: #000;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 255, 102, 0.08);
+}
+
+html[data-theme="cyberdeck"] .article-body figure.media-grid {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+html[data-theme="cyberdeck"] .article-body .media-grid-item {
   border: 1px solid rgba(0, 255, 102, 0.35);
   border-radius: 4px;
   background: #000;
