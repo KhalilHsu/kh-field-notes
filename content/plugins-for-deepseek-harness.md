@@ -14,9 +14,13 @@ DeepSeek Harness 开源后，我直接接入 DeepSeek V4 / V4 Pro 的 API 搭起
 ![中间过程折叠收起](media/dsh-folded-collapse.png)
 ![中间过程展开浏览](media/dsh-folded-expand.png)
 
-1. **长上下文定位**（`@khalilhsu/dsh-ui-query-navigator`）：在 1M 长上下文和多轮密集对话下，回看历史提问反复上下滚动很繁琐。这个插件在左侧提取每一轮 Query 作为时间轴锚点，支持滚动高亮、悬停预览与一键点击跳转。
+2. **长上下文定位**（`@khalilhsu/dsh-ui-query-navigator`）：在 1M 长上下文和多轮密集对话下，回看历史提问反复上下滚动很繁琐。这个插件在左侧提取每一轮 Query 作为时间轴锚点，支持滚动高亮、悬停预览与一键点击跳转。
 
 ![左轨 Query 导航器交互演示](media/dsh-plugins-demo.mp4)
+
+做这两个插件，大概花了 10 多块钱的 API 费用（消耗约 1.6 亿 Tokens）：
+
+![DeepSeek API 账单](media/dsh-api-bill.png)
 
 两个插件已开源并发布到 npm，可以通过官方插件机制直接安装：
 
