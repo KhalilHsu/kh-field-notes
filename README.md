@@ -1,98 +1,138 @@
 # KH Field Notes
 
-一个安静、文字优先的纯静态个人博客。文章以 `content/*.md` 为唯一内容源，单文件构建脚本编译输出至 `dist/`。
+一个安静、文字优先的纯静态个人博客。
 
-原生内置 **经典报刊 (Editorial)**、**画报潮流 (Magazine)** 与 **深潜终端 (Cyberdeck)** 三种视觉主题，并配备支持边缘吸附与持久化记忆的全局悬浮切换器。
+文章以 `content/*.md` 为唯一内容源，构建脚本编译输出至 `dist/`，无 CMS、无数据库、无后端。原生内置 **经典报刊 (Editorial)**、**画报潮流 (Magazine)**、**深潜终端 (Cyberdeck)** 三种视觉主题，并配备支持边缘吸附与持久化记忆的全局悬浮切换器。
 
 ---
 
-## 撰写与发布文章
+## 项目结构
 
-在 `content/` 目录下新建 Markdown 文件（如 `content/my-new-post.md`，文件名将直接作为文章的 URL Slug），头部填入 Front Matter 元数据：
+```text
+kh-field-notes/
+├── build.mjs              # 构建入口（含 --watch 热重建）
+├── package.json
+├── content/               # 所有内容源（这里是唯一要编辑的地方）
+│   ├── *.md               # 文章，文件名即 URL Slug
+│   ├── media/             # 文章配图与视频
+│   └── favicon.*          # 各格式网站图标
+├── src/                   # 构建源码
+│   ├── parser.mjs         # Markdown 解析（Front Matter / paragraphize）
+│   ├── template.mjs       # HTML 模板（shell / header / postItem / archiveItem）
+│   └── styles/
+│       ├── base.css       # Reset + 浮动 Dock 通用样式
+│       ├── editorial.css  # 经典报刊主题
+│       ├── magazine.css   # 画报潮流主题
+│       ├── cyberdeck.css  # 深潜终端主题
+│       └── responsive.css # 响应式断点
+└── dist/                  # 构建产物（自动生成，不要手动编辑）
+```
+
+---
+
+## 撰写文章
+
+在 `content/` 下新建 `.md` 文件（**文件名即文章 URL**），头部填入 Front Matter：
 
 ```md
 ---
 title: 文章标题
 date: 2026-08-24
 tags: AI / TOOLS / INTERFACE
-summary: 简短的一句话摘要，会展示在首页文章列表与文章导语中。
+summary: 简短的一句话摘要，展示在首页列表和文章导语中。
 cover: media/my-post-cover.png
 ---
 
-这里开始写正文内容...
+这里开始写正文...
 ```
 
-### 字段说明与规则
+### Front Matter 字段说明
 
-- **`title`**：文章主标题。
-- **`date`**：发布日期，格式固定为 `YYYY-MM-DD`。
-- **`tags`**：文章标签，多个标签使用 ` / ` 分隔，构建时会自动解析为多标签徽标。
-- **`summary`**：文章导语与列表摘要。
-- **`cover`**：首页列表封面图（独立于正文）。若暂无封面，系统会自动回退使用默认中性占位封面。
+| 字段 | 必填 | 说明 |
+| :--- | :---: | :--- |
+| `title` | ✅ | 文章主标题 |
+| `date` | ✅ | 发布日期，格式 `YYYY-MM-DD`，影响排序 |
+| `tags` | ✅ | 标签，多个用 ` / ` 分隔，自动解析为徽标 |
+| `summary` | ✅ | 首页摘要与文章导语 |
+| `cover` | — | 封面图路径（相对 `content/`），留空时自动回退到默认占位图 |
 
-> **⚠️ 注意：多主题下的封面/图片展示比例并不一致**
-> 不同主题为了契合各自的设计语言，对封面图有不同的渲染策略：
-> - **经典报刊 (Editorial)**：强制采用 **`3:2`** 比例裁切（`object-fit: cover`），追求报刊式严整对齐；
-> - **画报潮流 (Magazine)**：保持图片**原始宽高比**（`height: auto`），完整呈现视觉内容；
-> - **深潜终端 (Cyberdeck)**：采用宽屏 **`16:9`** 比例并叠加终端滤镜与扫描质感。
-> 
-> 建议封面图主体内容尽量居中，以在各个主题下均能获得良好的视觉效果。
+> **关于封面图的跨主题表现**
+> - **Editorial（报刊）**：强制 `3:2` 比例裁切（`object-fit: cover`）
+> - **Magazine（画报）**：保持原始宽高比（`height: auto`）
+> - **Cyberdeck（终端）**：固定 `3:2` 裁切并叠加扫描质感滤镜
+>
+> 建议封面图主体内容居中，以在各主题下均获得良好效果。
 
 ---
 
 ## 媒体与排版能力
 
-所有本地媒体资源请统一存放在 `content/media/` 目录下。
+所有本地媒体放入 `content/media/`，构建时自动同步至 `dist/media/`。
 
-### 1. 插入图片
+### 图片
 ```md
 ![图片说明](media/my-screenshot.png)
 ```
-构建时会自动将图片同步至 `dist/media/`，并在图片下方渲染图注（Caption）。
 
-### 2. 插入视频
-直接引用常见视频格式（`.mp4`、`.mov`、`.webm`）或使用 `@video` 前缀语法：
+### 视频（.mp4 / .mov / .webm）
 ```md
-@video[视频交互演示](media/demo-video.mp4)
+@video[视频说明](media/demo.mp4)
+```
+直接使用标准图片语法引用视频格式文件也会自动识别为视频。
+
+### 多图/视频并排网格
+同一段落内放置多个媒体标签，自动渲染为 2 列网格：
+```md
+![收起状态](media/collapse.png)
+![展开状态](media/expand.png)
 ```
 
-### 3. 多图 / 视频并排网格
-在同一段落内连续放置多个媒体标签，构建时会自动将其渲染为并排的 `.media-grid` 网格布局：
-```md
-![界面收起状态](media/screen-collapse.png)
-![界面展开状态](media/screen-expand.png)
-```
-
-### 4. 代码块与外链
-- **代码块**：支持使用 ` ```lang ` 标记代码块语言，自动生成对应语法容器。
-- **外链**：支持标准 Markdown 链接 `[文本](https://...)`，外部媒体链接也会自动识别。
+### 代码块 / 行内代码 / 外链
+- 代码块：标准 ` ```lang ` 语法，自动生成语法容器
+- 行内代码：`` `code` ``
+- 外链：`[文本](https://...)` —— 自动添加 `target="_blank" rel="noopener"`
+- 粗体：`**粗体**`
 
 ---
 
-## 本地预览与调试
+## 本地开发
 
 ```sh
-npm run dev
+npm run dev       # 构建 + watch + 静态服务器 http://localhost:8080
+npm run watch     # 仅构建 + watch（不启动服务器）
+npm run build     # 单次构建
 ```
 
-构建站点并在本地启动静态服务器，浏览器打开 `http://localhost:3000/` 即可实时预览。
+`--watch` 模式同时监听 `content/` 和 `src/styles/`，编辑文章或修改 CSS 均会自动重建。
 
 ---
 
-## 构建与部署
+## 部署
 
-```sh
-npm run build
-```
+`npm run build` 生成 `dist/`，直接发布该目录：
 
-执行静态构建，编译生成的 `dist/` 文件夹为纯静态产物：
-- **GitHub Pages**：可直接推送到 `gh-pages` 分支或在 GitHub Actions 中发布 `dist/` 目录；
-- **Cloudflare Pages**：构建命令填写 `npm run build`，输出目录填写 `dist`。
+- **GitHub Pages**：推送到 `gh-pages` 分支，或在 Actions 中发布 `dist/`
+- **Cloudflare Pages**：构建命令 `npm run build`，输出目录 `dist`
 
 ---
 
-## 架构与维护原则
+## 修改主题样式
 
-- **纯静态与单脚本**：保持 `scripts/build.mjs` 单文件静态生成逻辑，不引入复杂的第三方打包工具、CMS 或后端数据库。
-- **状态轻量化**：仅在客户端通过 `localStorage` 记录用户的主题偏好（`kh-theme`）及悬浮切换器位置（`kh-dock-pos`）。
-- **安全发布**：未经明确授权，不将草稿或本地私有改动推送至公网。
+每个主题对应 `src/styles/` 下的独立 CSS 文件，直接编辑对应文件，`npm run watch` 会自动重建：
+
+| 文件 | 对应主题 |
+| :--- | :--- |
+| `src/styles/editorial.css` | 经典报刊（默认） |
+| `src/styles/magazine.css` | 画报潮流 |
+| `src/styles/cyberdeck.css` | 深潜终端 |
+| `src/styles/base.css` | 通用 Reset + 浮动 Dock |
+| `src/styles/responsive.css` | 响应式断点 |
+
+---
+
+## 架构约束
+
+- **不要引入**打包工具（Vite、webpack）、CMS、数据库或服务端运行时
+- **不要手动编辑** `dist/`，它在每次构建时会被完整清空重建
+- **状态极简**：仅用 `localStorage` 记录主题偏好（`kh-theme`）和悬浮 Dock 位置（`kh-dock-pos`）
+- **未经明确授权，不推送至公网**
