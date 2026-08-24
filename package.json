@@ -1,9 +1,9 @@
 {
-  "name": "kh-field-notes",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "dev": "npm run build && python3 -m http.server 3000 --directory dist"
-  },
-  "type": "module"
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "dev": "node build.mjs --watch & python3 -m http.server 8080 --directory dist"
+  }
 }

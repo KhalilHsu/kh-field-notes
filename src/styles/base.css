@@ -1,0 +1,144 @@
+/* ==========================================================================
+   Base & Reset
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+  transition: background-color 0.25s ease;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  line-height: 1.7;
+}
+
+img, video {
+  max-width: 100%;
+  display: block;
+}
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .media-grid { grid-template-columns: 1fr; }
+}
+
+.media-grid-item { display: flex; flex-direction: column; }
+.media-grid-item img, .media-grid-item video { width: 100%; height: auto; display: block; }
+
+/* ==========================================================================
+   Floating Theme Dock (Precision Unified Segmented Control)
+   ========================================================================== */
+.floating-theme-dock {
+  position: fixed;
+  z-index: 99999;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 3px 3px 5px;
+  height: auto;
+  border-radius: 9999px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: grab;
+  will-change: left, right, top, bottom;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: calc(100vw - 36px);
+  border: 1.5px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.floating-theme-dock.is-dragging {
+  cursor: grabbing;
+  transform: scale(1.02);
+}
+
+.dock-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.45;
+  color: currentColor;
+  cursor: grab;
+  padding: 5px 3px 5px 3px;
+  border-radius: 9999px;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.dock-handle:hover { opacity: 0.9; background: rgba(128, 128, 128, 0.15); }
+.floating-theme-dock.is-dragging .dock-handle { cursor: grabbing; opacity: 1; background: rgba(128, 128, 128, 0.2); }
+
+.theme-switcher {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 9999px;
+  gap: 2px;
+  white-space: nowrap;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease, gap 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.theme-seg-btn {
+  border: none;
+  background: transparent;
+  color: inherit;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 32px;
+  height: 26px;
+  padding: 0;
+  opacity: 0.45;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.25s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0, 0, 1), background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.theme-seg-btn:hover { opacity: 0.85; }
+.theme-seg-btn.active { opacity: 1; }
+.theme-seg-btn svg { display: block; pointer-events: none; flex-shrink: 0; }
+
+/* Auto-collapse: show only active button when not hovered */
+.floating-theme-dock:not(.is-expanded) .theme-seg-btn:not(.active) {
+  width: 0;
+  opacity: 0;
+  transform: scale(0.7);
+  pointer-events: none;
+  margin: 0;
+  padding: 0;
+}
+.floating-theme-dock:not(.is-expanded) .theme-switcher { gap: 0; }

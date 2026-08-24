@@ -1,0 +1,312 @@
+/* ==========================================================================
+   THEME 2: Magazine / Quirky Orbit (画报潮流)
+   ========================================================================== */
+html[data-theme="magazine"],
+html[data-theme="cards"] {
+  --mag-bg: #ffffff;
+  --mag-black: #000000;
+  --mag-border: 2px solid #000000;
+  --mag-border-thick: 2.5px solid #000000;
+  --font-impact: Impact, "Arial Narrow", "Haettenschweiler", "Franklin Gothic Medium", -apple-system, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--mag-bg);
+}
+
+html[data-theme="magazine"] body,
+html[data-theme="cards"] body {
+  color: #000000;
+  font-family: var(--font-sans);
+  background: #ffffff;
+}
+
+html[data-theme="magazine"] .site-header-editorial-bar,
+html[data-theme="cards"] .site-header-editorial-bar,
+html[data-theme="magazine"] .site-header-cyber-masthead,
+html[data-theme="cards"] .site-header-cyber-masthead { display: none; }
+
+html[data-theme="magazine"] .page-intro-editorial,
+html[data-theme="cards"] .page-intro-editorial { display: none; }
+
+html[data-theme="magazine"] .site-header,
+html[data-theme="cards"] .site-header { max-width: 1240px; margin: 0 auto; padding: 24px 24px 0; }
+
+html[data-theme="magazine"] .site-header-mag-masthead,
+html[data-theme="cards"] .site-header-mag-masthead { display: flex; flex-direction: column; gap: 12px; }
+
+html[data-theme="magazine"] .mag-masthead-main,
+html[data-theme="cards"] .mag-masthead-main {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 10px 0 16px;
+}
+
+html[data-theme="magazine"] .mag-logo,
+html[data-theme="cards"] .mag-logo {
+  font-family: var(--font-impact);
+  font-size: clamp(52px, 8.8vw, 106px);
+  line-height: 0.88;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: #000000;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+html[data-theme="magazine"] .mag-slogan,
+html[data-theme="cards"] .mag-slogan {
+  display: flex; flex-direction: column;
+  font-family: var(--font-impact);
+  font-size: clamp(16px, 2.3vw, 26px);
+  line-height: 0.96; letter-spacing: -0.01em;
+  text-transform: uppercase; text-align: left;
+  max-width: 380px; color: #000000; padding-bottom: 4px;
+}
+
+html[data-theme="magazine"] .mag-bar-primary,
+html[data-theme="cards"] .mag-bar-primary {
+  display: flex; justify-content: space-between; align-items: center;
+  border: var(--mag-border-thick); padding: 10px 18px; background: #ffffff;
+}
+
+html[data-theme="magazine"] .mag-crumb,
+html[data-theme="cards"] .mag-crumb {
+  font-family: var(--font-impact); font-size: 20px; letter-spacing: 0.04em;
+  text-transform: uppercase; color: #000000; text-decoration: none;
+}
+
+html[data-theme="magazine"] .mag-nav-links,
+html[data-theme="cards"] .mag-nav-links { display: flex; align-items: center; gap: 26px; }
+
+html[data-theme="magazine"] .mag-nav-links a,
+html[data-theme="cards"] .mag-nav-links a {
+  font-family: var(--font-impact); font-size: 18px; letter-spacing: 0.05em;
+  text-transform: uppercase; color: #000000; text-decoration: none; transition: opacity 0.15s ease;
+}
+
+html[data-theme="magazine"] .mag-nav-links a:hover,
+html[data-theme="cards"] .mag-nav-links a:hover,
+html[data-theme="magazine"] .mag-nav-links a.is-current,
+html[data-theme="cards"] .mag-nav-links a.is-current { text-decoration: underline; text-underline-offset: 3px; }
+
+html[data-theme="magazine"] .page,
+html[data-theme="cards"] .page { max-width: 1240px; margin: 0 auto; padding: 32px 24px 80px; }
+
+html[data-theme="magazine"] .post-list,
+html[data-theme="cards"] .post-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: start;
+  gap: 28px 20px;
+  margin-top: 16px;
+  border: none;
+}
+
+html[data-theme="magazine"] .post-item,
+html[data-theme="cards"] .post-item {
+  display: flex; flex-direction: column; width: 100%;
+  background: #ffffff; padding: 0; border: none; min-height: 0;
+}
+
+html[data-theme="magazine"] .list-cover,
+html[data-theme="cards"] .list-cover { display: block; width: 100%; margin-bottom: 12px; text-decoration: none; }
+
+html[data-theme="magazine"] .cover-frame,
+html[data-theme="cards"] .cover-frame {
+  width: 100%; overflow: hidden; display: block; background: #f4f4f4;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html[data-theme="magazine"] .post-item:hover .cover-frame,
+html[data-theme="cards"] .post-item:hover .cover-frame { transform: translateY(-3px); }
+
+html[data-theme="magazine"] .cover-frame img,
+html[data-theme="cards"] .cover-frame img { width: 100%; height: auto; display: block; }
+
+/* Colorful frame borders */
+html[data-theme="magazine"] .post-item:nth-child(8n + 1) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 1) .cover-frame { border: 7px solid #d4c9b8; }
+html[data-theme="magazine"] .post-item:nth-child(8n + 2) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 2) .cover-frame { border: 7px solid #f99f38; }
+html[data-theme="magazine"] .post-item:nth-child(8n + 3) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 3) .cover-frame { border: 7px solid #1a1a1a; }
+html[data-theme="magazine"] .post-item:nth-child(8n + 4) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 4) .cover-frame { border: 7px solid #a3cc69; }
+html[data-theme="magazine"] .post-item:nth-child(8n + 5) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 5) .cover-frame { border: 7px solid #ff2a9d; }
+html[data-theme="magazine"] .post-item:nth-child(8n + 6) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 6) .cover-frame { border: 7px solid #f59e0b; }
+html[data-theme="magazine"] .post-item:nth-child(8n + 7) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 7) .cover-frame { border: 7px solid #c084fc; }
+html[data-theme="magazine"] .post-item:nth-child(8n + 8) .cover-frame,
+html[data-theme="cards"] .post-item:nth-child(8n + 8) .cover-frame { border: 7px solid #38bdf8; }
+
+html[data-theme="magazine"] .post-copy,
+html[data-theme="cards"] .post-copy { display: flex; flex-direction: column; }
+
+html[data-theme="magazine"] .post-item h2,
+html[data-theme="cards"] .post-item h2 {
+  font-family: var(--font-impact); font-size: 23px; line-height: 1.14;
+  letter-spacing: -0.01em; text-transform: uppercase; font-weight: 900;
+  margin: 0 0 10px; color: #000000;
+}
+
+html[data-theme="magazine"] .post-item h2 a,
+html[data-theme="cards"] .post-item h2 a { color: #000000; text-decoration: none; }
+html[data-theme="magazine"] .post-item h2 a:hover,
+html[data-theme="cards"] .post-item h2 a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+html[data-theme="magazine"] .post-date-dot,
+html[data-theme="magazine"] .post-date-bottom,
+html[data-theme="magazine"] .post-tags-container .tag,
+html[data-theme="cards"] .post-date-dot,
+html[data-theme="cards"] .post-date-bottom,
+html[data-theme="cards"] .post-tags-container .tag { display: none; }
+
+html[data-theme="magazine"] .post-meta-top,
+html[data-theme="cards"] .post-meta-top {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 6px;
+}
+
+html[data-theme="magazine"] .post-date-badge,
+html[data-theme="cards"] .post-date-badge {
+  display: inline-block; font-family: var(--font-impact); font-size: 13px;
+  font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #000000; margin-right: 2px;
+}
+
+html[data-theme="magazine"] .tag-badges,
+html[data-theme="cards"] .tag-badges { display: inline-flex; flex-wrap: wrap; gap: 5px; }
+
+html[data-theme="magazine"] .tag-badge,
+html[data-theme="cards"] .tag-badge {
+  display: inline-flex; align-items: center;
+  border: 1.5px solid #000000; padding: 2px 7px;
+  font-family: var(--font-sans); font-size: 10.5px;
+  font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  background: #ffffff; color: #000000; line-height: 1.2;
+}
+
+html[data-theme="magazine"] .summary,
+html[data-theme="cards"] .summary { display: none; }
+
+/* Archive */
+html[data-theme="magazine"] .archive-list,
+html[data-theme="cards"] .archive-list { display: grid; gap: 8px; margin-top: 24px; border-top: none; }
+
+html[data-theme="magazine"] .archive-item,
+html[data-theme="cards"] .archive-item {
+  display: grid; grid-template-columns: 110px 1fr auto;
+  align-items: center; gap: 18px; padding: 14px 18px;
+  border: var(--mag-border); background: #ffffff;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+html[data-theme="magazine"] .archive-item:hover,
+html[data-theme="cards"] .archive-item:hover { background: #f9f9f9; transform: translateX(4px); }
+
+html[data-theme="magazine"] .archive-date,
+html[data-theme="cards"] .archive-date { font-family: var(--font-impact); font-size: 15px; letter-spacing: 0.04em; color: #000000; }
+
+html[data-theme="magazine"] .archive-title,
+html[data-theme="cards"] .archive-title {
+  font-family: var(--font-impact); font-size: 19px; text-transform: uppercase;
+  color: #000000; text-decoration: none; letter-spacing: -0.01em;
+}
+html[data-theme="magazine"] .archive-title:hover,
+html[data-theme="cards"] .archive-title:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+html[data-theme="magazine"] .archive-tag-raw,
+html[data-theme="cards"] .archive-tag-raw { display: none; }
+html[data-theme="magazine"] .archive-tag-badges,
+html[data-theme="cards"] .archive-tag-badges { display: flex; gap: 6px; }
+
+html[data-theme="magazine"] .archive-link,
+html[data-theme="cards"] .archive-link { margin-top: 36px; }
+html[data-theme="magazine"] .archive-link a,
+html[data-theme="cards"] .archive-link a {
+  display: inline-block; border: var(--mag-border-thick); padding: 8px 18px;
+  font-family: var(--font-impact); font-size: 16px; letter-spacing: 0.04em;
+  text-transform: uppercase; color: #000000; text-decoration: none;
+  background: #ffffff; box-shadow: 3px 3px 0 #000000; transition: all 0.15s ease;
+}
+html[data-theme="magazine"] .archive-link a:hover,
+html[data-theme="cards"] .archive-link a:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #000000; }
+
+/* Article */
+html[data-theme="magazine"] .article,
+html[data-theme="cards"] .article { max-width: 1240px; margin: 28px auto 96px; padding: 0 24px; }
+
+html[data-theme="magazine"] .article-meta-header,
+html[data-theme="cards"] .article-meta-header {
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: var(--mag-border-thick); padding-bottom: 14px; margin-bottom: 24px;
+}
+
+html[data-theme="magazine"] .article-meta-header .tag,
+html[data-theme="cards"] .article-meta-header .tag { display: none; }
+
+html[data-theme="magazine"] .article-date,
+html[data-theme="cards"] .article-date { font-family: var(--font-impact); font-size: 16px; letter-spacing: 0.05em; color: #000000; }
+
+html[data-theme="magazine"] .article h1,
+html[data-theme="cards"] .article h1 {
+  font-family: var(--font-impact); font-size: clamp(40px, 6.5vw, 68px);
+  font-weight: 900; letter-spacing: -0.025em; line-height: 1.05;
+  text-transform: uppercase; margin: 0 0 24px; color: #000000;
+}
+
+html[data-theme="magazine"] .lead,
+html[data-theme="cards"] .lead {
+  font-size: 20px; line-height: 1.6; font-weight: 500; color: #222222;
+  border-left: 5px solid #000000; padding: 6px 0 6px 20px; margin: 0 0 44px;
+}
+
+html[data-theme="magazine"] .article-body,
+html[data-theme="cards"] .article-body { font-size: 18px; line-height: 1.85; color: #111111; }
+html[data-theme="magazine"] .article-body p,
+html[data-theme="cards"] .article-body p { margin: 0 0 1.6em; }
+html[data-theme="magazine"] .article-body figure,
+html[data-theme="cards"] .article-body figure { margin: 2.5em 0; border: none; background: transparent; }
+html[data-theme="magazine"] .article-body img,
+html[data-theme="cards"] .article-body img,
+html[data-theme="magazine"] .article-body video,
+html[data-theme="cards"] .article-body video { width: 100%; display: block; border-radius: 4px; }
+html[data-theme="magazine"] .article-body figcaption,
+html[data-theme="cards"] .article-body figcaption {
+  margin-top: 8px; padding: 0; background: transparent; color: #666666;
+  font-family: var(--font-sans); font-size: 13px; font-weight: 500; text-transform: none; border-top: none;
+}
+html[data-theme="magazine"] .article-body code,
+html[data-theme="cards"] .article-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  font-size: 0.88em; background: #f0f0f0; border: 1px solid #000000;
+  padding: 2px 6px; border-radius: 2px; color: #000000;
+}
+html[data-theme="magazine"] .article-body pre,
+html[data-theme="cards"] .article-body pre {
+  background: #f9f9f9; border: var(--mag-border); padding: 18px 22px;
+  border-radius: 0; box-shadow: 4px 4px 0 #000000; margin: 2em 0;
+}
+html[data-theme="magazine"] .article-body pre code,
+html[data-theme="cards"] .article-body pre code { background: none; border: none; padding: 0; font-size: 14px; }
+html[data-theme="magazine"] .article-body a,
+html[data-theme="cards"] .article-body a { color: #000000; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+html[data-theme="magazine"] .back,
+html[data-theme="cards"] .back {
+  display: inline-block; margin-top: 48px; border: var(--mag-border-thick); padding: 9px 20px;
+  font-family: var(--font-impact); font-size: 16px; letter-spacing: 0.04em;
+  text-transform: uppercase; color: #000000; text-decoration: none;
+  background: #ffffff; box-shadow: 3px 3px 0 #000000; transition: all 0.15s ease;
+}
+html[data-theme="magazine"] .back:hover,
+html[data-theme="cards"] .back:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #000000; }
+
+/* Magazine Floating Dock */
+html[data-theme="magazine"] .floating-theme-dock,
+html[data-theme="cards"] .floating-theme-dock {
+  background: #ffffff; border-color: #000000; box-shadow: 3px 3px 0 #000000; color: #000000;
+}
+html[data-theme="magazine"] .floating-theme-dock .theme-switcher,
+html[data-theme="cards"] .floating-theme-dock .theme-switcher { background: #f0f0f0; border-color: #000000; }
+html[data-theme="magazine"] .floating-theme-dock .theme-seg-btn.active,
+html[data-theme="cards"] .floating-theme-dock .theme-seg-btn.active { background: #000000; color: #ffffff; box-shadow: none; }
+html[data-theme="magazine"] .floating-theme-dock.is-dragging,
+html[data-theme="cards"] .floating-theme-dock.is-dragging { box-shadow: 7px 7px 0 #000000; }
