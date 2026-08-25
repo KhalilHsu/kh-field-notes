@@ -51,6 +51,18 @@ export function paragraphize(body, imagePrefix) {
       return `<figure class="media-grid media-grid-${mediaMatches.length}">\n${itemsHtml}\n</figure>`;
     }
 
+    if (trimmed.startsWith(">")) {
+      const quoteText = trimmed
+        .split(/\r?\n/)
+        .map((line) => line.replace(/^>\s?/, ""))
+        .join("\n");
+      let html = escapeHtml(quoteText);
+      html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+      html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+      html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      return `<blockquote><p>${html.replace(/\n/g, "<br>")}</p></blockquote>`;
+    }
+
     let html = escapeHtml(paragraph);
     html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
     html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
