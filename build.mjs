@@ -50,7 +50,7 @@ export async function build() {
     <p class="intro">一些做过的事、注意到的东西，和还没想清楚的问题。</p>
   </div>
   <section class="post-list" aria-label="最新文章">
-    ${latestPosts.map((post) => postItem(post, "post/", "")).join("\n")}
+    ${latestPosts.map((post, i) => postItem(post, "post/", "", i + 1)).join("\n")}
   </section>
   ${posts.length > latestPosts.length ? `<p class="archive-link"><a href="archive/">查看全部 ${posts.length} 篇文章 →</a></p>` : ""}
 </main>`;

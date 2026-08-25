@@ -83,6 +83,8 @@ html[data-theme="editorial"] .post-list {
   border-top: 1px solid var(--rule);
 }
 
+html[data-theme="editorial"] .mag-col { display: contents; }
+
 html[data-theme="editorial"] .post-item {
   display: grid;
   grid-template-columns: 350px 1fr;

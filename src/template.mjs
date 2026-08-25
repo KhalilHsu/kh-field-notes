@@ -57,6 +57,58 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
 
   <script>
     (function() {
+      var postList = document.querySelector('.post-list');
+      var originalPosts = postList ? Array.from(postList.querySelectorAll('.post-item')) : [];
+      var currentLayoutCols = 0;
+      var currentLayoutTheme = '';
+
+      function getMagazineCols() {
+        var w = window.innerWidth;
+        if (w <= 480) return 1;
+        if (w <= 768) return 2;
+        if (w <= 1024) return 3;
+        return 4;
+      }
+
+      function updateMagazineLayout(targetTheme) {
+        if (!postList || originalPosts.length === 0) return;
+        var t = targetTheme || document.documentElement.getAttribute('data-theme') || 'editorial';
+        if (t === 'cards') t = 'magazine';
+
+        if (t !== 'magazine') {
+          if (currentLayoutTheme === 'magazine' || postList.querySelector('.mag-col')) {
+            postList.innerHTML = '';
+            originalPosts.forEach(function(post) {
+              postList.appendChild(post);
+            });
+            currentLayoutCols = 0;
+          }
+          currentLayoutTheme = t;
+          return;
+        }
+
+        var targetCols = getMagazineCols();
+        if (currentLayoutTheme === 'magazine' && currentLayoutCols === targetCols && postList.querySelector('.mag-col')) {
+          return;
+        }
+
+        currentLayoutTheme = 'magazine';
+        currentLayoutCols = targetCols;
+
+        postList.innerHTML = '';
+        var cols = [];
+        for (var i = 0; i < targetCols; i++) {
+          var col = document.createElement('div');
+          col.className = 'mag-col';
+          cols.push(col);
+          postList.appendChild(col);
+        }
+
+        originalPosts.forEach(function(post, index) {
+          cols[index % targetCols].appendChild(post);
+        });
+      }
+
       function syncTheme(theme) {
         var t = (theme === 'magazine' || theme === 'cards') ? 'magazine' : (theme === 'cyberdeck' ? 'cyberdeck' : 'editorial');
         document.documentElement.setAttribute('data-theme', t);
@@ -68,10 +120,19 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
           btn.classList.toggle('active', active);
           btn.setAttribute('aria-checked', active ? 'true' : 'false');
         });
+        updateMagazineLayout(t);
       }
 
       var savedTheme = localStorage.getItem('kh-theme') || 'editorial';
       syncTheme(savedTheme);
+      updateMagazineLayout(savedTheme);
+
+      window.addEventListener('resize', function() {
+        var t = document.documentElement.getAttribute('data-theme');
+        if (t === 'magazine' || t === 'cards') {
+          updateMagazineLayout('magazine');
+        }
+      });
 
       var themeButtons = document.querySelectorAll('.theme-seg-btn');
       themeButtons.forEach(function(btn) {
@@ -294,8 +355,8 @@ export const header = (home, archive, activePage = "home") => `
   </div>
 </header>`;
 
-export const postItem = (post, prefix, mediaPrefix) => `
-<article class="post-item">
+export const postItem = (post, prefix, mediaPrefix, index) => `
+<article class="post-item"${typeof index === "number" ? ` data-color-index="${index}"` : ""}>
   <a class="list-cover" href="${prefix}${post.slug}/">
     <div class="cover-frame">
       <img src="${mediaPrefix}${escapeHtml(post.cover)}" alt="" loading="lazy">

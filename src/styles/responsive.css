@@ -4,7 +4,11 @@
 @media (max-width: 1024px) {
   html[data-theme="magazine"] .post-list,
   html[data-theme="cards"] .post-list {
-    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  html[data-theme="magazine"] .mag-col,
+  html[data-theme="cards"] .mag-col {
+    gap: 24px;
   }
 }
 
@@ -20,7 +24,9 @@
   html[data-theme="magazine"] .mag-masthead-main,
   html[data-theme="cards"] .mag-masthead-main { flex-direction: column; align-items: flex-start; gap: 12px; }
   html[data-theme="magazine"] .post-list,
-  html[data-theme="cards"] .post-list { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
+  html[data-theme="cards"] .post-list { gap: 16px; }
+  html[data-theme="magazine"] .mag-col,
+  html[data-theme="cards"] .mag-col { gap: 20px; }
   html[data-theme="magazine"] .archive-item,
   html[data-theme="cards"] .archive-item { grid-template-columns: 1fr; gap: 8px; }
 
@@ -32,5 +38,7 @@
 
 @media (max-width: 480px) {
   html[data-theme="magazine"] .post-list,
-  html[data-theme="cards"] .post-list { grid-template-columns: 1fr; }
+  html[data-theme="cards"] .post-list { gap: 0; }
+  html[data-theme="magazine"] .mag-col,
+  html[data-theme="cards"] .mag-col { gap: 24px; }
 }

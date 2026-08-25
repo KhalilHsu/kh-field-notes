@@ -91,18 +91,31 @@ html[data-theme="cards"] .page { max-width: 1240px; margin: 0 auto; padding: 32p
 
 html[data-theme="magazine"] .post-list,
 html[data-theme="cards"] .post-list {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  align-items: start;
-  gap: 28px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
   margin-top: 16px;
   border: none;
 }
 
+html[data-theme="magazine"] .mag-col,
+html[data-theme="cards"] .mag-col {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  flex: 1;
+  min-width: 0;
+}
+
 html[data-theme="magazine"] .post-item,
 html[data-theme="cards"] .post-item {
-  display: flex; flex-direction: column; width: 100%;
-  background: #ffffff; padding: 0; border: none; min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: #ffffff;
+  padding: 0;
+  border: none;
+  min-height: 0;
 }
 
 html[data-theme="magazine"] .list-cover,
@@ -121,20 +134,43 @@ html[data-theme="magazine"] .cover-frame img,
 html[data-theme="cards"] .cover-frame img { width: 100%; height: auto; display: block; }
 
 /* Colorful frame borders */
+html[data-theme="magazine"] .post-item[data-color-index="1"] .cover-frame,
+html[data-theme="cards"] .post-item[data-color-index="1"] .cover-frame,
 html[data-theme="magazine"] .post-item:nth-child(8n + 1) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 1) .cover-frame { border: 7px solid #d4c9b8; }
+
+html[data-theme="magazine"] .post-item[data-color-index="2"] .cover-frame,
+html[data-theme="cards"] .post-item[data-color-index="2"] .cover-frame,
 html[data-theme="magazine"] .post-item:nth-child(8n + 2) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 2) .cover-frame { border: 7px solid #f99f38; }
+
+html[data-theme="magazine"] .post-item[data-color-index="3"] .cover-frame,
+html[data-theme="cards"] .post-item[data-color-index="3"] .cover-frame,
 html[data-theme="magazine"] .post-item:nth-child(8n + 3) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 3) .cover-frame { border: 7px solid #1a1a1a; }
+
+html[data-theme="magazine"] .post-item[data-color-index="4"] .cover-frame,
+html[data-theme="cards"] .post-item[data-color-index="4"] .cover-frame,
 html[data-theme="magazine"] .post-item:nth-child(8n + 4) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 4) .cover-frame { border: 7px solid #a3cc69; }
+
+html[data-theme="magazine"] .post-item[data-color-index="5"] .cover-frame,
+html[data-theme="cards"] .post-item[data-color-index="5"] .cover-frame,
 html[data-theme="magazine"] .post-item:nth-child(8n + 5) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 5) .cover-frame { border: 7px solid #ff2a9d; }
+
+html[data-theme="magazine"] .post-item[data-color-index="6"] .cover-frame,
+html[data-theme="cards"] .post-item[data-color-index="6"] .cover-frame,
 html[data-theme="magazine"] .post-item:nth-child(8n + 6) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 6) .cover-frame { border: 7px solid #f59e0b; }
+
+html[data-theme="magazine"] .post-item[data-color-index="7"] .cover-frame,
+html[data-theme="cards"] .post-item[data-color-index="7"] .cover-frame,
 html[data-theme="magazine"] .post-item:nth-child(8n + 7) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 7) .cover-frame { border: 7px solid #c084fc; }
+
+html[data-theme="magazine"] .post-item[data-color-index="8"] .cover-frame,
+html[data-theme="cards"] .post-item[data-color-index="8"] .cover-frame,
 html[data-theme="magazine"] .post-item:nth-child(8n + 8) .cover-frame,
 html[data-theme="cards"] .post-item:nth-child(8n + 8) .cover-frame { border: 7px solid #38bdf8; }
 
