@@ -46,8 +46,12 @@ export async function build() {
 <main class="page">
   <div class="page-intro-editorial">
     <p class="eyebrow">PERSONAL NOTES</p>
-    <h1>KH Field Notes</h1>
+    <h1>Random Shit</h1>
     <p class="intro">一些做过的事、注意到的东西，和还没想清楚的问题。</p>
+    <div class="cyber-sys-info">
+      <span>LOC: [NET_NODE_0x7F]</span>
+      <span>SYS: [NOMINAL]</span>
+    </div>
   </div>
   <section class="post-list" aria-label="最新文章">
     ${latestPosts.map((post, i) => postItem(post, "post/", "", i + 1)).join("\n")}
@@ -57,7 +61,7 @@ export async function build() {
 
   await writeFile(
     path.join(outputDirectory, "index.html"),
-    shell({ title: "KH Field Notes", description: "一些做过的事、注意到的东西，和还没想清楚的问题。", content: `${header("./", "archive/", "home")}${introduction}`, stylesheet: "styles.css", assetPrefix: "" })
+    shell({ title: "Random Shit", description: "一些做过的事、注意到的东西，和还没想清楚的问题。", content: `${header("./", "archive/", "home")}${introduction}`, stylesheet: "styles.css", assetPrefix: "" })
   );
 
   // Archive pages
@@ -80,7 +84,7 @@ export async function build() {
     const depth = page === 1 ? "../" : "../../../";
     await writeFile(
       path.join(directory, "index.html"),
-      shell({ title: "归档", description: "KH Field Notes 的所有文章。", content: `${header(depth, "./", "archive")}${archive}`, stylesheet: `${depth}styles.css`, assetPrefix: depth })
+      shell({ title: "归档", description: "Khalil's Random Shit 的所有文章。", content: `${header(depth, "./", "archive")}${archive}`, stylesheet: `${depth}styles.css`, assetPrefix: depth })
     );
   }
 

@@ -17,13 +17,14 @@ export const renderTagBadges = (tagsStr) =>
     .map((t) => `<span class="tag-badge">${escapeHtml(t)}</span>`).join("");
 
 export function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
+  const pageTitle = title === "Random Shit" ? "Random Shit · Khalil" : (title ? `${title} · Khalil` : "Khalil's Random Shit");
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="${escapeHtml(description)}">
-  <title>${escapeHtml(title)} · KH Field Notes</title>
+  <title>${escapeHtml(pageTitle)}</title>
   <link rel="icon" href="${assetPrefix}favicon.svg" type="image/svg+xml">
   <link rel="icon" href="${assetPrefix}favicon.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="${assetPrefix}apple-touch-icon.png">
@@ -301,7 +302,16 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
 export const header = (home, archive, activePage = "home") => `
 <header class="site-header">
   <div class="site-header-editorial-bar">
-    <a class="site-title" href="${home}">KH Field Notes</a>
+    <a class="site-title" href="${home}">
+      <svg class="site-logo-icon" width="22" height="22" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <rect width="64" height="64" rx="16" fill="#141413"/>
+        <g transform="translate(32, 32) scale(2.2) translate(-12, -12)">
+          <path stroke="#faf9f6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5L12.5 3.5c.8-1.5 2.8-1 2.8.8 0 3.6-3.2 10.6-4.5 15.2"/>
+          <path stroke="#faf9f6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M10.8 12c1.6-1.5 4.5-1.5 4.6 1 .2 2.2-2.2 2.8-4.2 2.8 2.5.5 5.5 1.2 8.5 2.5"/>
+        </g>
+      </svg>
+      <span>Khalil</span>
+    </a>
     <nav class="nav-editorial" aria-label="主导航">
       <a href="${home}" class="${activePage === "home" ? "is-active" : ""}">文章</a>
       <a href="${archive}" class="${activePage === "archive" ? "is-active" : ""}">归档</a>
@@ -311,11 +321,11 @@ export const header = (home, archive, activePage = "home") => `
 
   <div class="site-header-mag-masthead">
     <div class="mag-masthead-main">
-      <a class="mag-logo" href="${home}">KH FIELD NOTES</a>
+      <a class="mag-logo" href="${home}">KHALIL'S RANDOM SHIT</a>
       <div class="mag-slogan">
         <span>NAVIGATING AI, TOOLS,</span>
         <span>INTERFACES &amp; CREATIVE</span>
-        <span>FIELD EXPERIMENTS</span>
+        <span>RANDOM EXPERIMENTS</span>
       </div>
     </div>
     <div class="mag-bar-primary">
@@ -332,18 +342,12 @@ export const header = (home, archive, activePage = "home") => `
 
   <div class="site-header-cyber-masthead">
     <div class="cyber-masthead-main">
-      <div class="cyber-brand">
-        <a class="cyber-logo" href="${home}"><span class="cyber-prompt-sym">&gt;</span> KH_FIELD_NOTES<span class="cyber-cursor">_</span></a>
-        <span class="cyber-status-pill">● ONLINE // NETRUNNER_V3.0</span>
-      </div>
-      <div class="cyber-sys-info">
-        <span>LOC: [NET_NODE_0x7F]</span>
-        <span>SYS: [NOMINAL]</span>
-      </div>
+      <a class="cyber-logo" href="${home}"><span class="cyber-prompt-sym">&gt;</span> KHALIL<span class="cyber-cursor">_</span></a>
+      <span class="cyber-status-pill">● ONLINE // NETRUNNER_V3.0</span>
     </div>
     <div class="cyber-bar-primary">
       <div class="cyber-bar-left">
-        <span class="cyber-cli-prompt">root@kh-notes:~$</span>
+        <span class="cyber-cli-prompt">root@random-shit:~$</span>
         <span class="cyber-cli-cmd">${activePage === "home" ? "ls -la ./stories" : (activePage === "archive" ? "cat ./archive" : "view ./article")}</span>
       </div>
       <nav class="cyber-nav-links" aria-label="深潜终端导航">

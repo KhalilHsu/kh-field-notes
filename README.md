@@ -1,4 +1,4 @@
-# KH Field Notes
+# Khalil's Random Shit
 
 一个安静、文字优先的纯静态个人博客。
 
@@ -9,7 +9,7 @@
 ## 项目结构
 
 ```text
-kh-field-notes/
+khalil-random-shit/
 ├── build.mjs              # 构建入口（含 --watch 热重建）
 ├── package.json
 ├── content/               # 所有内容源（这里是唯一要编辑的地方）
