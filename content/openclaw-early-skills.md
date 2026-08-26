@@ -1,6 +1,6 @@
 ---
 title: 我给 OpenClaw 写的两个早期 Skill
-date: 2026-08-25
+date: 2026-03-15
 tags: AGENT / OPENCLAW / TOOLS / PROMPT
 summary: 从网页抓取的降级阶梯到双向 UI 灵感库，给刚学会干活的 Agent 建立一套应对现实混乱的操作纪律。
 cover: media/clawhub-skills-cover.png

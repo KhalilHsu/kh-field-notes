@@ -1,6 +1,6 @@
 ---
 title: 给本地 Agent 倒一杯卡布奇诺
-date: 2026-08-24
+date: 2026-08-06
 tags: MACOS / AGENT / TOOLS / SWIFT
 summary: 防休眠与状态保持，给跑任务的本地 Agent 倒上一杯清醒的咖啡。
 cover: media/coffee-or-tea-cover.png
