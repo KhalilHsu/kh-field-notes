@@ -109,7 +109,7 @@ html[data-theme="editorial"] .list-cover img { width: 100%; height: 100%; object
 html[data-theme="editorial"] .post-copy { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; }
 
 html[data-theme="editorial"] .post-date-badge,
-html[data-theme="editorial"] .post-date-top,
+html[data-theme="editorial"] .post-date-dot,
 html[data-theme="editorial"] .tag-badges,
 html[data-theme="editorial"] .archive-tag-badges { display: none; }
 
