@@ -1,12 +1,12 @@
 ---
 title: 我给 OpenClaw 写的两个早期 Skill
-date: 2026-03-15
+date: 2026-01-28
 tags: AGENT / OPENCLAW / TOOLS / PROMPT
 summary: 从网页抓取的降级阶梯到双向 UI 灵感库，给刚学会干活的 Agent 建立一套应对现实混乱的操作纪律。
 cover: media/clawhub-skills-cover.png
 ---
 
-今年 2 月底我刚开始折腾 OpenClaw。当时生态里的大多数 Agent Skill 还停留在比较初级的阶段：写一段看似完备的 System Prompt，然后期待大模型在真实场景里心领神会。
+今年 1 月底我刚开始折腾 OpenClaw。当时生态里的大多数 Agent Skill 还停留在比较初级的阶段：写一段看似完备的 System Prompt，然后期待大模型在真实场景里心领神会。
 
 但一旦把 Agent 真正放进复杂的日常工作流，这种“单靠 Prompt 许愿”的脆弱性就会暴露无遗。真实世界充斥着动态渲染的 SPA 网页、反爬拦截、弹窗遮罩，以及堆满无索引截图却再也翻不出来的灵感碎屑。
 
