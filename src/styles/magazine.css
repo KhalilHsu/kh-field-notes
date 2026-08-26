@@ -41,7 +41,7 @@ html[data-theme="cards"] .mag-masthead-main {
 html[data-theme="magazine"] .mag-logo,
 html[data-theme="cards"] .mag-logo {
   font-family: var(--font-impact);
-  font-size: clamp(52px, 8.8vw, 106px);
+  font-size: clamp(38px, 6.2vw, 84px);
   line-height: 0.88;
   letter-spacing: -0.025em;
   text-transform: uppercase;
@@ -324,6 +324,23 @@ html[data-theme="magazine"] .article-body pre code,
 html[data-theme="cards"] .article-body pre code { background: none; border: none; padding: 0; font-size: 14px; }
 html[data-theme="magazine"] .article-body a,
 html[data-theme="cards"] .article-body a { color: #000000; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+html[data-theme="magazine"] .article-body h1,
+html[data-theme="magazine"] .article-body h2,
+html[data-theme="magazine"] .article-body h3,
+html[data-theme="magazine"] .article-body h4,
+html[data-theme="cards"] .article-body h1,
+html[data-theme="cards"] .article-body h2,
+html[data-theme="cards"] .article-body h3,
+html[data-theme="cards"] .article-body h4 {
+  color: #000000;
+  font-family: var(--font-impact);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+html[data-theme="magazine"] .article-body hr,
+html[data-theme="cards"] .article-body hr {
+  border-top: 2px solid #000000;
+}
 html[data-theme="magazine"] .article-body blockquote,
 html[data-theme="cards"] .article-body blockquote {
   margin: 2em 0; padding: 16px 20px; border-left: 4px solid #000000;
