@@ -18,6 +18,7 @@
 
   html[data-theme="editorial"] .post-item,
   html[data-theme="editorial"] .archive-item { grid-template-columns: 1fr; gap: 14px; }
+  html[data-theme="editorial"] .list-cover { aspect-ratio: 3 / 2; }
   html[data-theme="editorial"] .archive-item span { display: none; }
 
   html[data-theme="magazine"] .mag-masthead-main,

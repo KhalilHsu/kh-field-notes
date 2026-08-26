@@ -97,13 +97,14 @@ html[data-theme="editorial"] .post-item {
 html[data-theme="editorial"] .list-cover {
   display: block;
   width: 100%;
-  background: transparent;
+  aspect-ratio: 3 / 2;
+  background: #eeece7;
   overflow: hidden;
   border-radius: 2px;
 }
 
-html[data-theme="editorial"] .cover-frame { width: 100%; height: auto; }
-html[data-theme="editorial"] .list-cover img { width: 100%; height: auto; display: block; border-radius: 2px; }
+html[data-theme="editorial"] .cover-frame { width: 100%; height: 100%; }
+html[data-theme="editorial"] .list-cover img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
 
 html[data-theme="editorial"] .post-copy { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; }
 
