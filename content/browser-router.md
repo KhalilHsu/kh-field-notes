@@ -1,8 +1,8 @@
 ---
-title: 写了一个 macOS 浏览器外链分流插件
+title: 为什么默认浏览器只能选一个
 date: 2026-04-16
 tags: MACOS / TOOLS / SWIFT
-summary: 把工作、个人、OAuth 与多浏览器多 Profile 彻底隔开，不用再在错的窗口里反复复制粘贴。
+summary: 写了一个插件，支持按场景自动跳转浏览器，让每个 URL 打开到合适的浏览器。
 cover: media/browser-router-cover.png
 ---
 
@@ -16,11 +16,11 @@ cover: media/browser-router-cover.png
 
 它的逻辑非常直接：把自己注册为 macOS 系统的默认 HTTP/HTTPS 协议处理器，当其他应用发起“打开链接”请求时，BrowserRouter 会在毫秒级内根据预设规则进行定向路由。
 
-在分流逻辑的设计上，我主要聚焦在三个核心环节：
+在分流逻辑的设计上，我主要做了这几件微小的事情：
 
 第一是**按来源应用与域名智能分流**。比如从 Slack、飞书或工作邮件点出来的链接，自动送进工作浏览器；从微信、Telegram 或 RSS 阅读器点出来的，则直接交给日常阅读浏览器。
 
-第二是**原生 Profile 级精准唤起**。深度支持 Chromium 系列与各类现代浏览器的多 Profile 机制，直接将链接送进指定的 Profile 实例，无需编写任何额外的分流脚本。
+第二是**原生 Profile 级精准唤起**。支持 Chromium 系列与各类现代浏览器的多 Profile 机制，直接将链接送进指定的 Profile 实例，无需编写任何额外的分流脚本。
 
 第三是**跟手的手动分流选择器（Chooser）**。遇到临时测试链接或 OAuth 登录回调时，只需在点击链接的同时按住修饰键，光标位置就会即刻弹出一个轻盈的原生选择面板，快速完成手动分流。
 

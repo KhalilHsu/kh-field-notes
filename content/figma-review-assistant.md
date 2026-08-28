@@ -1,7 +1,7 @@
 ---
 title: 写了一个 Figma 设计审稿插件
 date: 2026-04-09
-tags: FIGMA / DESIGN / TOOLS / AI
+tags: FIGMA / DESIGN / TOOLS
 summary: 把眯眼判断信息结构的习惯做成工具，快速完成低保真骨架重构与多维视觉诊断。
 cover: media/figma-plugin-cover.png
 ---
@@ -12,9 +12,11 @@ cover: media/figma-plugin-cover.png
 
 ![Design Review Assistant 结构抽象与多维诊断面板](media/figma-plugin-cover.png)
 
-在设计上，主要聚焦在两个核心环节：
+在功能上，主要聚焦在两个核心环节：
 
 - **低保真骨架重构（Squint Test Blocks）**：自动提取选中的 Figma 容器或界面，将其抽象为一套极简的色块布局，剥离所有细节干扰，让你在一瞬间看清画面的几何体量与视觉流动。
 - **多维视觉诊断（Visual Audit）**：从信息层级（Hierarchy）、元素亲密度（Proximity）、对齐秩序（Alignment）与留白节奏（Whitespace）等维度出发，基于元素间的相对关系给出具体、可执行的调整建议。
+
+整体插件试了好几版最后也没上 AI，我其实挺讨厌什么都 AI 的，能 code 解决的东西，成本更低更稳定，难道不是更好吗
 
 > **项目地址**：[GitHub - KhalilHsu/Figma_Plugin](https://github.com/KhalilHsu/Figma_Plugin)

@@ -6,9 +6,9 @@ summary: 把用完即走的外部链接关进轻量缓冲窗口，让外链浏�
 cover: media/minichrome-cover.png
 ---
 
-作为一个用户，在 Arc 浏览器里我最喜欢的功能其实叫 **Little Arc**。
+作为一个 Arc 骨灰级用户，在 Arc 浏览器里我最喜欢的功能其实叫 **Little Arc**。
 
-在日常使用中，我们经常会从各种应用点开大量用完即走的临时网页。Little Arc 能让这些页面在一个轻量弹窗里快速打开，看完随手关掉，不用堆积在浏览器窗口或侧边栏里。虽然 Chrome 也有侧边栏功能，但整体上并没有这种轻盈的体验。
+在日常使用中，我们经常会从各种应用点开大量用完即走的临时网页。Little Arc 能让这些页面在一个轻量弹窗里快速打开，看完随手关掉，不用堆积在浏览器窗口或侧边栏里。
 
 为了在 Chrome 里找回这种克制的外链体验，我用 Chrome 插件配合系统做了一个 Mini Arc：[PeekLink（miniChrome）](https://github.com/KhalilHsu/miniChrome)。
 
