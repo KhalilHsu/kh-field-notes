@@ -1,6 +1,6 @@
 import path from "node:path";
 
-export const fallbackCover = "media/placeholder-cover.png";
+export const fallbackCover = "assets/placeholder-cover.png";
 
 export const escapeHtml = (value) =>
   value.replace(/[&<>'"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[c]);
@@ -19,7 +19,7 @@ export function renderInline(text) {
   return html;
 }
 
-export function paragraphize(body, imagePrefix) {
+export function paragraphize(body, imagePrefix = "") {
   const codeBlocks = [];
   const processedBody = body.replace(/```([a-z0-9_-]*)\n([\s\S]*?)```/gi, (_, lang, code) => {
     const placeholder = `<!--CODEBLOCK_${codeBlocks.length}-->`;
@@ -49,11 +49,16 @@ export function paragraphize(body, imagePrefix) {
     const withoutMedia = trimmed.replace(/(?:@video|!)\[([^\]]*)\]\(([^)\s]+)\)/gi, "").trim();
 
     if (mediaMatches.length > 0 && withoutMedia === "") {
+      const resolveSrc = (rawSrc) => {
+        if (/^https?:\/\//i.test(rawSrc)) return escapeHtml(rawSrc);
+        const normalized = rawSrc.replace(/^\.\//, "");
+        return imagePrefix ? `${imagePrefix}${escapeHtml(normalized)}` : escapeHtml(normalized);
+      };
+
       if (mediaMatches.length === 1) {
         const alt = escapeHtml(mediaMatches[0][1]);
         const rawSrc = mediaMatches[0][2];
-        const isExternal = /^https?:\/\//i.test(rawSrc);
-        const src = isExternal ? escapeHtml(rawSrc) : `${imagePrefix}${escapeHtml(rawSrc)}`;
+        const src = resolveSrc(rawSrc);
         const isVideo = mediaMatches[0][0].startsWith("@video") || /\.(mp4|mov|webm|m4v|ogg)$/i.test(rawSrc);
         if (isVideo) {
           return `<figure class="media-video"><video src="${src}" controls playsinline preload="metadata"></video>${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
@@ -64,8 +69,7 @@ export function paragraphize(body, imagePrefix) {
       const itemsHtml = mediaMatches.map((m) => {
         const alt = escapeHtml(m[1]);
         const rawSrc = m[2];
-        const isExternal = /^https?:\/\//i.test(rawSrc);
-        const src = isExternal ? escapeHtml(rawSrc) : `${imagePrefix}${escapeHtml(rawSrc)}`;
+        const src = resolveSrc(rawSrc);
         const isVideo = m[0].startsWith("@video") || /\.(mp4|mov|webm|m4v|ogg)$/i.test(rawSrc);
         if (isVideo) {
           return `<div class="media-grid-item"><video src="${src}" controls playsinline preload="metadata"></video>${alt ? `<figcaption>${alt}</figcaption>` : ""}</div>`;
@@ -117,8 +121,9 @@ export function paragraphize(body, imagePrefix) {
       const flushList = () => {
         if (currentList) {
           const tag = currentList.type;
+          const startAttr = currentList.type === "ol" && currentList.start && currentList.start !== 1 ? ` start="${currentList.start}"` : "";
           const lis = currentList.items.map((it) => `<li>${renderInline(it)}</li>`).join("\n");
-          htmlChunks.push(`<${tag}>\n${lis}\n</${tag}>`);
+          htmlChunks.push(`<${tag}${startAttr}>\n${lis}\n</${tag}>`);
           currentList = null;
         }
       };
@@ -129,7 +134,7 @@ export function paragraphize(body, imagePrefix) {
 
         const hMatch = tLine.match(/^(#{1,6})\s+(.*)$/);
         const ulMatch = tLine.match(/^[-*]\s+(.*)$/);
-        const olMatch = tLine.match(/^\d+\.\s+(.*)$/);
+        const olMatch = tLine.match(/^(\d+)\.\s+(.*)$/);
 
         if (hMatch) {
           flushParagraph();
@@ -144,8 +149,9 @@ export function paragraphize(body, imagePrefix) {
         } else if (olMatch) {
           flushParagraph();
           if (currentList && currentList.type !== "ol") flushList();
-          if (!currentList) currentList = { type: "ol", items: [] };
-          currentList.items.push(olMatch[1]);
+          const startNum = parseInt(olMatch[1], 10);
+          if (!currentList) currentList = { type: "ol", start: startNum, items: [] };
+          currentList.items.push(olMatch[2]);
         } else {
           flushList();
           currentParagraph.push(tLine);
@@ -161,7 +167,7 @@ export function paragraphize(body, imagePrefix) {
   }).filter(Boolean).join("\n");
 }
 
-export function parsePost(source, filename) {
+export function parsePost(source, filename, explicitSlug) {
   const normalized = source.replace(/^\uFEFF/, "").trimStart();
   const match = normalized.match(/^(?:---|[*]{3,}|-{3,})\r?\n([\s\S]*?)\r?\n(?:---|[*]{3,}|-{3,})\r?\n?([\s\S]*)$/);
   if (!match) throw new Error(`${filename} needs front matter.`);
@@ -175,5 +181,14 @@ export function parsePost(source, filename) {
         return [line.slice(0, index).trim(), line.slice(index + 1).trim()];
       })
   );
-  return { ...metadata, cover: metadata.cover || fallbackCover, slug: path.basename(filename, ".md"), body: match[2].trim() };
+  const slug = explicitSlug || (filename.endsWith(".md") && path.basename(filename, ".md") !== "index" ? path.basename(filename, ".md") : path.basename(path.dirname(filename)));
+  
+  let cover = metadata.cover ? metadata.cover.replace(/^\.\//, "").replace(/^media\//, "") : "";
+  let isFallbackCover = false;
+  if (!cover) {
+    cover = fallbackCover;
+    isFallbackCover = true;
+  }
+
+  return { ...metadata, cover, isFallbackCover, slug, body: match[2].trim() };
 }

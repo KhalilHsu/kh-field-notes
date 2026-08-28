@@ -3,7 +3,7 @@ title: 给本地 Agent 倒一杯卡布奇诺
 date: 2026-08-06
 tags: MACOS / AGENT / TOOLS / SWIFT
 summary: 防休眠与状态保持，给跑任务的本地 Agent 倒上一杯清醒的咖啡。
-cover: media/coffee-or-tea-cover.png
+cover: coffee-or-tea-cover.png
 ---
 
 有一次我让 Codex Agent 帮我处理一件需要用到 Computer Use 的任务，随后我就离开桌面去打球了。过了两个小时打完球回来，打开电脑，发现它因为系统自动锁定一直卡在最开始的地方，一点都没干，让人非常不爽。
@@ -12,7 +12,7 @@ cover: media/coffee-or-tea-cover.png
 
 为了给本地 Agent 一个最轻快、最让人放心的运行环境，我写了这个原生的 macOS 菜单栏小工具：[KeepAwake（CoffeeORTea）](https://khalilhsu.github.io/CoffeeORTea/)。
 
-![KeepAwake 原生菜单栏与防休眠控制面板](media/coffee-or-tea-cover.png)
+![KeepAwake 原生菜单栏与防休眠控制面板](coffee-or-tea-cover.png)
 
 它的核心逻辑非常纯粹：像给 Mac 倒了一杯咖啡一样，一键让系统保持清醒；不需要时，轻轻一拨恢复正常的系统节律。
 

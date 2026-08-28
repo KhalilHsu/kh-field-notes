@@ -13,9 +13,13 @@ khalil-random-shit/
 ├── build.mjs              # 构建入口（含 --watch 热重建）
 ├── package.json
 ├── content/               # 所有内容源（这里是唯一要编辑的地方）
-│   ├── *.md               # 文章，文件名即 URL Slug
-│   ├── media/             # 文章配图与视频
-│   └── favicon.*          # 各格式网站图标
+│   ├── assets/            # 全站公共资产（favicon、默认占位封面等）
+│   │   ├── favicon.*
+│   │   └── placeholder-cover.png
+│   ├── <article-slug>/    # 每篇文章独立目录（Page Bundle）
+│   │   ├── index.md       # 文章正文
+│   │   └── *.png / *.mp4  # 该文章专属配图与视频
+│   └── ...
 ├── src/                   # 构建源码
 │   ├── parser.mjs         # Markdown 解析（Front Matter / paragraphize）
 │   ├── template.mjs       # HTML 模板（shell / header / postItem / archiveItem）
@@ -32,7 +36,7 @@ khalil-random-shit/
 
 ## 撰写文章
 
-在 `content/` 下新建 `.md` 文件（**文件名即文章 URL**），头部填入 Front Matter：
+在 `content/` 下新建一个文章目录（如 `content/my-new-post/`），并在其内部创建 `index.md` 和存放专属素材：
 
 ```md
 ---
@@ -40,7 +44,7 @@ title: 文章标题
 date: 2026-08-24
 tags: AI / TOOLS / INTERFACE
 summary: 简短的一句话摘要，展示在首页列表和文章导语中。
-cover: media/my-post-cover.png
+cover: my-post-cover.png
 ---
 
 这里开始写正文...
@@ -54,7 +58,7 @@ cover: media/my-post-cover.png
 | `date` | ✅ | 发布日期，格式 `YYYY-MM-DD`，影响排序 |
 | `tags` | ✅ | 标签，多个用 ` / ` 分隔，自动解析为徽标 |
 | `summary` | ✅ | 首页摘要与文章导语 |
-| `cover` | — | 封面图路径（相对 `content/`），留空时自动回退到默认占位图 |
+| `cover` | — | 封面图文件名（同目录下，如 `cover.png`），留空时自动回退到默认占位图 |
 
 > **关于封面图的跨主题表现**
 > - **Editorial（报刊）**：强制 `3:2` 比例裁切（`object-fit: cover`）
@@ -67,16 +71,16 @@ cover: media/my-post-cover.png
 
 ## 媒体与排版能力
 
-所有本地媒体放入 `content/media/`，构建时自动同步至 `dist/media/`。
+每篇文章的图片与视频直接放置在各自的文章目录下，使用同级相对路径引用：
 
 ### 图片
 ```md
-![图片说明](media/my-screenshot.png)
+![图片说明](my-screenshot.png)
 ```
 
 ### 视频（.mp4 / .mov / .webm）
 ```md
-@video[视频说明](media/demo.mp4)
+@video[视频说明](demo.mp4)
 ```
 直接使用标准图片语法引用视频格式文件也会自动识别为视频。
 

@@ -28,6 +28,7 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
   <link rel="icon" href="${assetPrefix}favicon.svg" type="image/svg+xml">
   <link rel="icon" href="${assetPrefix}favicon.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="${assetPrefix}apple-touch-icon.png">
+  <link rel="preload" href="${assetPrefix}assets/fonts/cormorant-garamond-700.woff2" as="font" type="font/woff2" crossorigin>
   <script>(function(){var t=localStorage.getItem('kh-theme')||'editorial';if(t==='cards')t='magazine';document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="${stylesheet}">
 </head>
@@ -313,8 +314,8 @@ export const header = (home, archive, activePage = "home") => `
       <span>Khalil</span>
     </a>
     <nav class="nav-editorial" aria-label="主导航">
-      <a href="${home}" class="${activePage === "home" ? "is-active" : ""}">文章</a>
-      <a href="${archive}" class="${activePage === "archive" ? "is-active" : ""}">归档</a>
+      <a href="${home}" class="${activePage === "home" ? "is-active" : ""}">Blog</a>
+      <a href="${archive}" class="${activePage === "archive" ? "is-active" : ""}">Archive</a>
       <a href="https://github.com/KhalilHsu" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </nav>
   </div>
@@ -333,7 +334,7 @@ export const header = (home, archive, activePage = "home") => `
         <a href="${home}" class="mag-crumb ${activePage === "home" ? "is-current" : ""}">HOME</a>
       </div>
       <nav class="mag-nav-links" aria-label="画报导航">
-        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">STORIES</a>
+        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">BLOG</a>
         <a href="${archive}" class="${activePage === "archive" ? "is-current" : ""}">ARCHIVE</a>
         <a href="https://github.com/KhalilHsu" target="_blank" rel="noopener noreferrer">GITHUB ↗</a>
       </nav>
@@ -348,10 +349,10 @@ export const header = (home, archive, activePage = "home") => `
     <div class="cyber-bar-primary">
       <div class="cyber-bar-left">
         <span class="cyber-cli-prompt">root@random-shit:~$</span>
-        <span class="cyber-cli-cmd">${activePage === "home" ? "ls -la ./stories" : (activePage === "archive" ? "cat ./archive" : "view ./article")}</span>
+        <span class="cyber-cli-cmd">${activePage === "home" ? "ls -la ./blog" : (activePage === "archive" ? "cat ./archive" : "view ./article")}</span>
       </div>
       <nav class="cyber-nav-links" aria-label="深潜终端导航">
-        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">[./STORIES]</a>
+        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">[./BLOG]</a>
         <a href="${archive}" class="${activePage === "archive" ? "is-current" : ""}">[./ARCHIVE]</a>
         <a href="https://github.com/KhalilHsu" target="_blank" rel="noopener noreferrer">[./GITHUB ↗]</a>
       </nav>
@@ -359,11 +360,15 @@ export const header = (home, archive, activePage = "home") => `
   </div>
 </header>`;
 
-export const postItem = (post, prefix, mediaPrefix, index) => `
+export const postItem = (post, prefix = "post/", mediaPrefix = "", index) => {
+  const coverSrc = post.isFallbackCover
+    ? `${mediaPrefix}assets/placeholder-cover.png`
+    : (post.cover.startsWith("http") ? post.cover : `${mediaPrefix}${prefix}${post.slug}/${post.cover}`);
+  return `
 <article class="post-item"${typeof index === "number" ? ` data-color-index="${index}"` : ""}>
   <a class="list-cover" href="${prefix}${post.slug}/">
     <div class="cover-frame">
-      <img src="${mediaPrefix}${escapeHtml(post.cover)}" alt="" loading="lazy">
+      <img src="${coverSrc}" alt="" loading="lazy">
     </div>
   </a>
   <div class="post-copy">
@@ -380,6 +385,7 @@ export const postItem = (post, prefix, mediaPrefix, index) => `
     <time datetime="${post.date}" class="post-date-bottom">${formatDateDot(post.date)}</time>
   </div>
 </article>`;
+};
 
 export const archiveItem = (post, prefix) => `
 <article class="archive-item">

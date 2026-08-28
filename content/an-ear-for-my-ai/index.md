@@ -3,7 +3,7 @@ title: 帮 AI 装了一只耳朵
 date: 2026-08-19
 tags: AI / INTERFACE
 summary: 无关 Coding，我只是让桌面上多了一个可以揪着耳朵说话的对象。
-cover: media/ai-ear-cover.png
+cover: ai-ear-cover.png
 ---
 
 最近高强度和 AI 对谈，每天聊得太多了，脑子里想法冒得太快，打字的效率太低 并且会不由自主的进行一些删减。

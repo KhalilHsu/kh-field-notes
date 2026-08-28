@@ -3,15 +3,15 @@ title: 我给自己做的两个 OpenClaw Skill
 date: 2026-01-28
 tags: AGENT / OPENCLAW / TOOLS
 summary: 一个帮我过滤 Newsletter，一个帮我找回收集过的 UI。两个很小的东西，后来加起来下载了几千次。
-cover: media/clawhub-skills-cover.png
+cover: clawhub-skills-cover.png
 ---
 
 刚开始用 OpenClaw 那段时间，我基本每天都在跟它聊，有时候停不下来，聊到凌晨两三点都有。就是在那段时间里，我第一次想着给自己做几个 Skill。
 
 不是要做什么通用的工具，就是按照自己的使用习惯来。我做了两个：
 
-![Article Summarizer Plus](media/skill-article-summarizer.png)
-![UI Inspiration Library](media/skill-ui-inspiration.png)
+![Article Summarizer Plus](skill-article-summarizer.png)
+![UI Inspiration Library](skill-ui-inspiration.png)
 
 **Article Summarizer Plus**，是因为我订阅了不少 Newsletter，但经常懒得打开，不知道值不值得读。我希望 OpenClaw 能帮我先过一遍，告诉我这篇讲了什么，我再决定要不要认真看。
 
