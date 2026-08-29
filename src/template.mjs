@@ -52,11 +52,11 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
       <button type="button" class="theme-seg-btn" data-theme-val="editorial" role="radio" title="经典报刊 (Editorial)" aria-label="经典报刊">
         <svg width="14.5" height="14.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5L12.5 3.5c.8-1.5 2.8-1 2.8.8 0 3.6-3.2 10.6-4.5 15.2"/><path d="M10.8 12c1.6-1.5 4.5-1.5 4.6 1 .2 2.2-2.2 2.8-4.2 2.8 2.5.5 5.5 1.2 8.5 2.5"/></svg>
       </button>
-      <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" title="画报潮流 (Magazine)" aria-label="画报潮流">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.2 4h3.8l5 9.4 5-9.4h3.8v16h-3.4V8.5l-4.4 8.2h-2L6.6 8.5V20H3.2V4z"/></svg>
-      </button>
       <button type="button" class="theme-seg-btn" data-theme-val="cyberdeck" role="radio" title="深潜终端 (Cyberdeck)" aria-label="深潜终端">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.2 4h3.8l5 13.2L17 4h3.8L13.8 20h-3.6L3.2 4z"/></svg>
+      </button>
+      <button type="button" class="theme-seg-btn" data-theme-val="magazine" role="radio" title="画报潮流 (Magazine)" aria-label="画报潮流">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.2 4h3.8l5 9.4 5-9.4h3.8v16h-3.4V8.5l-4.4 8.2h-2L6.6 8.5V20H3.2V4z"/></svg>
       </button>
     </div>
   </aside>

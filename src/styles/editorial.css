@@ -113,27 +113,21 @@ html[data-theme="editorial"] .post-list {
 html[data-theme="editorial"] .mag-col { display: contents; }
 
 html[data-theme="editorial"] .post-item {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  align-items: start;
-  gap: 36px;
-  padding: 28px 0 32px;
+  display: block;
+  padding: 26px 0 30px;
   border-bottom: 1px solid var(--rule);
 }
 
 html[data-theme="editorial"] .list-cover {
-  display: block;
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  background: #eeece7;
-  overflow: hidden;
-  border-radius: 2px;
+  display: none;
 }
 
-html[data-theme="editorial"] .cover-frame { width: 100%; height: 100%; }
-html[data-theme="editorial"] .list-cover img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
-
-html[data-theme="editorial"] .post-copy { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; }
+html[data-theme="editorial"] .post-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
 html[data-theme="editorial"] .post-date-badge,
 html[data-theme="editorial"] .post-date-dot,

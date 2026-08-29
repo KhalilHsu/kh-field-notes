@@ -1,8 +1,6 @@
 import { watch } from "node:fs";
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { parsePost, paragraphize } from "./src/parser.mjs";
-import { shell, header, postItem, archiveItem } from "./src/template.mjs";
 
 const root = process.cwd();
 const contentDirectory = path.join(root, "content");
@@ -18,6 +16,9 @@ async function loadStyles() {
 
 export async function build() {
   const pageSize = 50;
+  const updateKey = Date.now();
+  const { parsePost, paragraphize } = await import(`./src/parser.mjs?t=${updateKey}`);
+  const { shell, header, postItem, archiveItem } = await import(`./src/template.mjs?t=${updateKey}`);
 
   await rm(outputDirectory, { recursive: true, force: true });
   await mkdir(path.join(outputDirectory, "archive"), { recursive: true });

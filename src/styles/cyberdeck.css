@@ -131,17 +131,8 @@ html[data-theme="cyberdeck"] .post-item:hover {
 html[data-theme="cyberdeck"] .post-item:hover h2 a { color: var(--cyber-green); text-shadow: 0 0 10px var(--cyber-green-glow); }
 
 html[data-theme="cyberdeck"] .list-cover {
-  display: block; width: 100%; aspect-ratio: 3 / 2; overflow: hidden;
-  background: #000; margin-bottom: 14px; border: 1px solid rgba(0, 255, 102, 0.2);
+  display: none;
 }
-
-html[data-theme="cyberdeck"] .cover-frame { width: 100%; height: 100%; }
-html[data-theme="cyberdeck"] .cover-frame img {
-  width: 100%; height: 100%; object-fit: cover;
-  opacity: 1;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-html[data-theme="cyberdeck"] .post-item:hover .cover-frame img { opacity: 1; transform: scale(1.02); }
 
 html[data-theme="cyberdeck"] .post-copy { display: flex; flex-direction: column; flex: 1; }
 
