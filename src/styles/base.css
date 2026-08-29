@@ -6,25 +6,63 @@
 }
 
 html {
-  overflow-y: scroll;
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+  overflow-y: auto;
+  scrollbar-width: none;
   transition: background-color 0.25s ease;
 }
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.16);
-  border-radius: 999px;
-  border: 2px solid transparent;
-  background-clip: content-box;
+html::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.35);
-  border: 2px solid transparent;
-  background-clip: content-box;
+
+.page-scrollbar {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 100000;
+  width: 12px;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  contain: layout paint style;
+  isolation: isolate;
+  transform: translateZ(0);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+.page-scrollbar[hidden] {
+  display: none;
+}
+
+.page-scrollbar-thumb {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  width: 6px;
+  min-height: 40px;
+  border-radius: 999px;
+  background: #b9b8b4;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
+  cursor: grab;
+}
+
+.page-scrollbar-thumb.is-dragging {
+  cursor: grabbing;
+}
+
+html[data-theme="magazine"] .page-scrollbar-thumb,
+html[data-theme="cards"] .page-scrollbar-thumb {
+  background: #8e8d89;
+}
+
+html[data-theme="cyberdeck"] .page-scrollbar-thumb {
+  background: #03702f;
 }
 
 body {

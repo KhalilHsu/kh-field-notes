@@ -35,6 +35,10 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
 <body>
   ${content}
 
+  <div class="page-scrollbar" id="pageScrollbar" role="scrollbar" aria-label="页面滚动位置" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" tabindex="0">
+    <div class="page-scrollbar-thumb" id="pageScrollbarThumb"></div>
+  </div>
+
   <aside class="floating-theme-dock" id="themeDock" aria-label="主题风格切换">
     <div class="dock-handle" title="按住可随意拖拽，松开自动吸附边缘" aria-hidden="true">
       <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor">
@@ -123,6 +127,7 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
           btn.setAttribute('aria-checked', active ? 'true' : 'false');
         });
         updateMagazineLayout(t);
+        requestScrollbarUpdate();
       }
 
       var savedTheme = localStorage.getItem('kh-theme') || 'editorial';
@@ -146,6 +151,92 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
           this.blur();
         });
       });
+
+      var pageScrollbar = document.getElementById('pageScrollbar');
+      var pageScrollbarThumb = document.getElementById('pageScrollbarThumb');
+      var scrollbarFrame = 0;
+      var scrollbarDrag = null;
+
+      function getScrollbarMetrics() {
+        var viewportHeight = window.innerHeight;
+        var scrollHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+        var maxScroll = Math.max(0, scrollHeight - viewportHeight);
+        var thumbHeight = maxScroll > 0 ? Math.max(40, viewportHeight * viewportHeight / scrollHeight) : 0;
+        var maxThumbTop = Math.max(0, viewportHeight - thumbHeight);
+        return { viewportHeight: viewportHeight, scrollHeight: scrollHeight, maxScroll: maxScroll, thumbHeight: thumbHeight, maxThumbTop: maxThumbTop };
+      }
+
+      function updateCustomScrollbar() {
+        scrollbarFrame = 0;
+        if (!pageScrollbar || !pageScrollbarThumb) return;
+        var metrics = getScrollbarMetrics();
+        var thumbTop = metrics.maxScroll > 0 ? (window.scrollY / metrics.maxScroll) * metrics.maxThumbTop : 0;
+        pageScrollbar.hidden = metrics.maxScroll <= 0;
+        pageScrollbarThumb.style.height = metrics.thumbHeight + 'px';
+        pageScrollbarThumb.style.transform = 'translate3d(0,' + thumbTop + 'px,0)';
+        pageScrollbar.setAttribute('aria-valuemax', String(Math.round(metrics.maxScroll)));
+        pageScrollbar.setAttribute('aria-valuenow', String(Math.round(window.scrollY)));
+      }
+
+      function requestScrollbarUpdate() {
+        if (!scrollbarFrame) scrollbarFrame = requestAnimationFrame(updateCustomScrollbar);
+      }
+
+      if (pageScrollbar && pageScrollbarThumb) {
+        window.addEventListener('scroll', requestScrollbarUpdate, { passive: true });
+        window.addEventListener('resize', requestScrollbarUpdate);
+        window.addEventListener('load', requestScrollbarUpdate);
+        document.addEventListener('load', requestScrollbarUpdate, true);
+        if (window.ResizeObserver) new ResizeObserver(requestScrollbarUpdate).observe(document.body);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(requestScrollbarUpdate);
+
+        pageScrollbarThumb.addEventListener('pointerdown', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var metrics = getScrollbarMetrics();
+          scrollbarDrag = { pointerId: e.pointerId, startY: e.clientY, startScrollY: window.scrollY, metrics: metrics };
+          pageScrollbarThumb.classList.add('is-dragging');
+          pageScrollbarThumb.setPointerCapture(e.pointerId);
+        });
+
+        pageScrollbarThumb.addEventListener('pointermove', function(e) {
+          if (!scrollbarDrag || scrollbarDrag.pointerId !== e.pointerId) return;
+          var metrics = scrollbarDrag.metrics;
+          var scrollPerPixel = metrics.maxThumbTop > 0 ? metrics.maxScroll / metrics.maxThumbTop : 0;
+          window.scrollTo(0, scrollbarDrag.startScrollY + (e.clientY - scrollbarDrag.startY) * scrollPerPixel);
+        });
+
+        function finishScrollbarDrag(e) {
+          if (!scrollbarDrag || scrollbarDrag.pointerId !== e.pointerId) return;
+          scrollbarDrag = null;
+          pageScrollbarThumb.classList.remove('is-dragging');
+        }
+
+        pageScrollbarThumb.addEventListener('pointerup', finishScrollbarDrag);
+        pageScrollbarThumb.addEventListener('pointercancel', finishScrollbarDrag);
+
+        pageScrollbar.addEventListener('pointerdown', function(e) {
+          if (e.target !== pageScrollbar) return;
+          var metrics = getScrollbarMetrics();
+          if (metrics.maxScroll <= 0) return;
+          var targetTop = Math.max(0, Math.min(metrics.maxThumbTop, e.clientY - metrics.thumbHeight / 2));
+          window.scrollTo(0, (targetTop / metrics.maxThumbTop) * metrics.maxScroll);
+        });
+
+        pageScrollbar.addEventListener('keydown', function(e) {
+          var handled = true;
+          if (e.key === 'ArrowDown') window.scrollBy(0, 40);
+          else if (e.key === 'ArrowUp') window.scrollBy(0, -40);
+          else if (e.key === 'PageDown' || e.key === ' ') window.scrollBy(0, window.innerHeight * 0.9);
+          else if (e.key === 'PageUp') window.scrollBy(0, -window.innerHeight * 0.9);
+          else if (e.key === 'Home') window.scrollTo(0, 0);
+          else if (e.key === 'End') window.scrollTo(0, document.documentElement.scrollHeight);
+          else handled = false;
+          if (handled) e.preventDefault();
+        });
+
+        requestScrollbarUpdate();
+      }
 
       var dock = document.getElementById('themeDock');
       if (!dock) return;
