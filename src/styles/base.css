@@ -5,6 +5,13 @@
   box-sizing: border-box;
 }
 
+html.is-preload-transitions,
+html.is-preload-transitions *,
+html.is-preload-transitions *::before,
+html.is-preload-transitions *::after {
+  transition: none !important;
+}
+
 html {
   overflow-y: auto;
   scrollbar-width: none;

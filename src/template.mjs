@@ -29,7 +29,7 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
   <link rel="icon" href="${assetPrefix}favicon.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="${assetPrefix}apple-touch-icon.png">
   <link rel="preload" href="${assetPrefix}assets/fonts/cormorant-garamond-700.woff2" as="font" type="font/woff2" crossorigin>
-  <script>(function(){var t=localStorage.getItem('kh-theme')||'editorial';if(t==='cards')t='magazine';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <script>(function(){var t=localStorage.getItem('kh-theme')||'editorial';if(t==='cards')t='magazine';document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.add('is-preload-transitions');window.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('is-preload-transitions');});});});})();</script>
   <link rel="stylesheet" href="${stylesheet}">
 </head>
 <body>
