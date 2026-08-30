@@ -482,8 +482,4 @@ export const archiveItem = (post, prefix) => `
 <article class="archive-item">
   <time datetime="${post.date}" class="archive-date">${formatDateDot(post.date)}</time>
   <a href="${prefix}${post.slug}/" class="archive-title">${escapeHtml(post.title)}</a>
-  <div class="archive-tags">
-    <span class="archive-tag-raw">${escapeHtml(post.tags)}</span>
-    <div class="archive-tag-badges">${renderTagBadges(post.tags)}</div>
-  </div>
 </article>`;

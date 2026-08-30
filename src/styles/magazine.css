@@ -228,7 +228,7 @@ html[data-theme="cards"] .archive-list { display: grid; gap: 8px; margin-top: 24
 
 html[data-theme="magazine"] .archive-item,
 html[data-theme="cards"] .archive-item {
-  display: grid; grid-template-columns: 110px 1fr auto;
+  display: grid; grid-template-columns: 110px 1fr;
   align-items: center; gap: 18px; padding: 14px 18px;
   border: var(--mag-border); background: #ffffff;
   transition: transform 0.15s ease, background 0.15s ease;
@@ -247,11 +247,6 @@ html[data-theme="cards"] .archive-title {
 }
 html[data-theme="magazine"] .archive-title:hover,
 html[data-theme="cards"] .archive-title:hover { text-decoration: underline; text-underline-offset: 3px; }
-
-html[data-theme="magazine"] .archive-tag-raw,
-html[data-theme="cards"] .archive-tag-raw { display: none; }
-html[data-theme="magazine"] .archive-tag-badges,
-html[data-theme="cards"] .archive-tag-badges { display: flex; gap: 6px; }
 
 html[data-theme="magazine"] .archive-link,
 html[data-theme="cards"] .archive-link { margin-top: 36px; }
