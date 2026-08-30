@@ -20,7 +20,7 @@ export async function build() {
   const { parsePost, paragraphize } = await import(`./src/parser.mjs?t=${updateKey}`);
   const { shell, header, postItem, archiveItem } = await import(`./src/template.mjs?t=${updateKey}`);
 
-  await rm(outputDirectory, { recursive: true, force: true });
+  await mkdir(outputDirectory, { recursive: true });
   await mkdir(path.join(outputDirectory, "archive"), { recursive: true });
   await mkdir(path.join(outputDirectory, "post"), { recursive: true });
   await mkdir(path.join(outputDirectory, "assets"), { recursive: true });
@@ -31,8 +31,8 @@ export async function build() {
     for (const file of assetFiles) {
       if (file.startsWith(".")) continue;
       const src = path.join(assetsDirectory, file);
-      await cp(src, path.join(outputDirectory, "assets", file), { recursive: true });
-      await cp(src, path.join(outputDirectory, file), { recursive: true });
+      await cp(src, path.join(outputDirectory, "assets", file), { recursive: true, force: true });
+      await cp(src, path.join(outputDirectory, file), { recursive: true, force: true });
     }
   } catch (error) {
     if (error.code !== "ENOENT") console.warn("Assets copy warning:", error.message);
