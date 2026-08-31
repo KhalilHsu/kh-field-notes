@@ -1,5 +1,5 @@
 ---
-title: 你听的每张专辑可能也是一种你的表达
+title: 你听的每张专辑，都是一种自我表达
 date: 2026-07-05
 tags: MUSIC / INTERFACE / DESIGN
 summary: 听过的专辑本身就是一种自我表达，所以我把它们全挂在了墙上。

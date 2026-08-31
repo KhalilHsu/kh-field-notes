@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { build } from "./build.mjs";
 
-const PORT = 8080;
+const PORT = parseInt(process.env.PORT, 10) || 3000;
 const root = process.cwd();
 const distDir = path.join(root, "dist");
 const contentDir = path.join(root, "content");

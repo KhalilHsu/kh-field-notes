@@ -16,7 +16,7 @@ cover: one-picture-cover.png
 
 ---
 
-今年 5 月底（5 月 28 日）休婚假的时候，我在云南，趁着闲暇用 Codex Web 写出了这个应用：**One Picture**。
+今年 5 月底（5 月 28 日）休婚假的时候，我在云南，趁着闲暇用 Codex Vibe 了这个应用：**One Picture**。
 
 ![One Picture 交互演示与使用流程](ee.mov)
 
