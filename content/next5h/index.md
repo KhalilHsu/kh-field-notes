@@ -46,3 +46,4 @@ ChatGPT Plus 把 5 小时的用量窗口加上了。
 把这两个时间差卡上之后，后半夜的算力没被浪费，白天的可用窗口也多出了一整轮。
 
 > **项目地址**：[GitHub - KhalilHsu/next5h](https://github.com/KhalilHsu/next5h)
+> **官网地址**：[Next5h 官方主页](https://khalilhsu.github.io/next5h/)
