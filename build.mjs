@@ -1,6 +1,7 @@
 import { watch } from "node:fs";
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const root = process.cwd();
 const contentDirectory = path.join(root, "content");
@@ -200,24 +201,28 @@ export async function build() {
   console.log(`✅ Built ${posts.length} posts → dist/`);
 }
 
-if (process.argv.includes("--watch") || process.argv.includes("-w")) {
-  await build();
-  console.log("👀 Watching content/ and src/styles/ for changes... Press Ctrl+C to stop.");
-  let timeout = null;
-  const triggerBuild = () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(async () => {
-      try {
-        const start = Date.now();
-        await build();
-        console.log(`⚡ Rebuilt in ${Date.now() - start}ms [${new Date().toLocaleTimeString()}]`);
-      } catch (err) {
-        console.error("⚠️ Build error:", err.message);
-      }
-    }, 100);
-  };
-  try { watch(contentDirectory, { recursive: true }, triggerBuild); } catch (err) { console.error("Watch content failed:", err); }
-  try { watch(path.join(root, "src"), { recursive: true }, triggerBuild); } catch (err) { console.error("Watch src failed:", err); }
-} else {
-  await build();
+const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+
+if (isDirectRun) {
+  if (process.argv.includes("--watch") || process.argv.includes("-w")) {
+    await build();
+    console.log("👀 Watching content/ and src/styles/ for changes... Press Ctrl+C to stop.");
+    let timeout = null;
+    const triggerBuild = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(async () => {
+        try {
+          const start = Date.now();
+          await build();
+          console.log(`⚡ Rebuilt in ${Date.now() - start}ms [${new Date().toLocaleTimeString()}]`);
+        } catch (err) {
+          console.error("⚠️ Build error:", err.message);
+        }
+      }, 100);
+    };
+    try { watch(contentDirectory, { recursive: true }, triggerBuild); } catch (err) { console.error("Watch content failed:", err); }
+    try { watch(path.join(root, "src"), { recursive: true }, triggerBuild); } catch (err) { console.error("Watch src failed:", err); }
+  } else {
+    await build();
+  }
 }

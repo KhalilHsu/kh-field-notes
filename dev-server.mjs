@@ -66,7 +66,7 @@ const server = http.createServer((req, res) => {
   stream.pipe(res);
 });
 
-server.listen(PORT, "127.0.0.1", () => {
+server.listen(PORT, () => {
   console.log(`🚀 Dev server running with ZERO cache at http://localhost:${PORT}`);
 });
 
