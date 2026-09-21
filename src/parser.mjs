@@ -167,11 +167,11 @@ export function paragraphize(body, imagePrefix = "") {
   }).filter(Boolean).join("\n");
 }
 
-export function parsePost(source, filename, explicitSlug) {
+export function parsePost(source, filename, explicitSlug, fallbackMeta = {}) {
   const normalized = source.replace(/^\uFEFF/, "").trimStart();
   const match = normalized.match(/^(?:---|[*]{3,}|-{3,})\r?\n([\s\S]*?)\r?\n(?:---|[*]{3,}|-{3,})\r?\n?([\s\S]*)$/);
   if (!match) throw new Error(`${filename} needs front matter.`);
-  const metadata = Object.fromEntries(
+  const rawMetadata = Object.fromEntries(
     match[1]
       .trim()
       .split(/\r?\n/)
@@ -181,7 +181,12 @@ export function parsePost(source, filename, explicitSlug) {
         return [line.slice(0, index).trim(), line.slice(index + 1).trim()];
       })
   );
-  const slug = explicitSlug || (filename.endsWith(".md") && path.basename(filename, ".md") !== "index" ? path.basename(filename, ".md") : path.basename(path.dirname(filename)));
+  const metadata = { ...fallbackMeta, ...rawMetadata };
+  const baseName = path.basename(filename);
+  const isEn = baseName.includes(".en.") || baseName.endsWith(".en.md");
+  const lang = metadata.lang || (isEn ? "en" : "zh");
+
+  const slug = explicitSlug || (filename.endsWith(".md") && !baseName.startsWith("index") ? path.basename(filename, path.extname(filename)).replace(/\.(en|zh)$/, "") : path.basename(path.dirname(filename)));
   
   let cover = metadata.cover ? metadata.cover.replace(/^\.\//, "").replace(/^media\//, "") : "";
   let isFallbackCover = false;
@@ -190,5 +195,5 @@ export function parsePost(source, filename, explicitSlug) {
     isFallbackCover = true;
   }
 
-  return { ...metadata, cover, isFallbackCover, slug, body: match[2].trim() };
+  return { ...metadata, lang, cover, isFallbackCover, slug, body: match[2].trim() };
 }

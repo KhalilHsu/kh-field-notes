@@ -35,6 +35,48 @@ html[data-theme="editorial"] .site-header-editorial-bar {
   justify-content: space-between;
 }
 
+html[data-theme="editorial"] .header-lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1;
+}
+
+html[data-theme="editorial"] .header-lang-switch .lang-btn {
+  color: var(--muted);
+  text-decoration: none !important;
+  padding: 1px 2px;
+  transition: color 0.15s ease;
+}
+
+html[data-theme="editorial"] .header-lang-switch .lang-btn:hover {
+  color: var(--ink);
+  text-decoration: none !important;
+}
+
+html[data-theme="editorial"] .header-lang-switch .lang-btn.is-active {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none !important;
+  cursor: default;
+  pointer-events: none;
+}
+
+html[data-theme="editorial"] .header-lang-switch .lang-sep {
+  color: var(--rule);
+  font-size: 11px;
+  user-select: none;
+}
+
+html[data-theme="editorial"] .header-nav-divider {
+  color: var(--rule);
+  font-size: 13px;
+  user-select: none;
+  margin: 0 -4px;
+}
+
 html[data-theme="editorial"] .site-header-mag-masthead,
 html[data-theme="editorial"] .site-header-cyber-masthead {
   display: none;

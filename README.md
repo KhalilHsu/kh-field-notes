@@ -17,14 +17,16 @@ khalil-random-shit/
 │   │   ├── favicon.*
 │   │   └── placeholder-cover.png
 │   ├── <article-slug>/    # 每篇文章独立目录（Page Bundle）
-│   │   ├── index.md       # 文章正文
-│   │   └── *.png / *.mp4  # 该文章专属配图与视频
+│   │   ├── index.md       # 中文文章正文（默认）
+│   │   ├── index.en.md    # 英文文章正文（可选，支持多语言）
+│   │   └── *.png / *.mp4  # 该文章专属配图与视频（中英两版共享）
 │   └── ...
 ├── src/                   # 构建源码
+│   ├── i18n.mjs           # 国际化文案字典与语言助手
 │   ├── parser.mjs         # Markdown 解析（Front Matter / paragraphize）
 │   ├── template.mjs       # HTML 模板（shell / header / postItem / archiveItem）
 │   └── styles/
-│       ├── base.css       # Reset + 浮动 Dock 通用样式
+│       ├── base.css       # Reset + 浮动 Dock + 语言切换按钮
 │       ├── editorial.css  # 经典报刊主题
 │       ├── magazine.css   # 画报潮流主题
 │       ├── cyberdeck.css  # 深潜终端主题
@@ -34,9 +36,9 @@ khalil-random-shit/
 
 ---
 
-## 撰写文章
+## 撰写文章与多语言
 
-在 `content/` 下新建一个文章目录（如 `content/my-new-post/`），并在其内部创建 `index.md` 和存放专属素材：
+在 `content/` 下新建一个文章目录（如 `content/my-new-post/`），并在其内部创建 `index.md`（中文版）或 `index.en.md`（英文版），并存放专属素材（中英文共享同目录素材）：
 
 ```md
 ---

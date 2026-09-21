@@ -1,4 +1,5 @@
 import { escapeHtml } from "./parser.mjs";
+import { getT } from "./i18n.mjs";
 
 export const formatDateDot = (value) => value.replaceAll("-", ".");
 
@@ -16,20 +17,24 @@ export const renderTagBadges = (tagsStr) =>
   tagsStr.split("/").map((t) => t.trim()).filter(Boolean)
     .map((t) => `<span class="tag-badge">${escapeHtml(t)}</span>`).join("");
 
-export function shell({ title, description, content, stylesheet, assetPrefix = "" }) {
+export function shell({ title, description, content, stylesheet, assetPrefix = "", locale = "zh", alternates = [], zhHref = "", enHref = "" }) {
   const pageTitle = title === "Random Shit" ? "Random Shit · Khalil" : (title ? `${title} · Khalil` : "Khalil's Random Shit");
+  const langAttr = locale === "en" ? "en" : "zh-CN";
+  const alternateLinks = alternates.map((alt) => `<link rel="alternate" hreflang="${escapeHtml(alt.lang)}" href="${escapeHtml(alt.href)}">`).join("\n  ");
+  const langRedirectScript = (zhHref || enHref) ? `<script>(function(){try{var s=localStorage.getItem('kh-lang');var isZh=(navigator.languages&&navigator.languages[0]||navigator.language||'').toLowerCase().startsWith('zh');var t=s||(isZh?'zh':'en');var c='${locale}';if(t!==c){var dest=t==='en'?'${escapeHtml(enHref)}':'${escapeHtml(zhHref)}';if(dest&&dest!=='./'&&dest!==''){location.replace(dest);}}}catch(e){}})();</script>` : "";
   return `<!doctype html>
-<html lang="zh-CN">
+<html lang="${langAttr}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="${escapeHtml(description)}">
   <title>${escapeHtml(pageTitle)}</title>
-  <link rel="icon" href="${assetPrefix}favicon.svg" type="image/svg+xml">
+  ${alternateLinks ? alternateLinks + "\n  " : ""}<link rel="icon" href="${assetPrefix}favicon.svg" type="image/svg+xml">
   <link rel="icon" href="${assetPrefix}favicon.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="${assetPrefix}apple-touch-icon.png">
   <link rel="preload" href="${assetPrefix}assets/fonts/cormorant-garamond-700.woff2" as="font" type="font/woff2" crossorigin>
   <script>(function(){var t=localStorage.getItem('kh-theme')||'editorial';if(t==='cards')t='magazine';document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.add('is-preload-transitions');window.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('is-preload-transitions');});});});})();</script>
+  ${langRedirectScript}
   <link rel="stylesheet" href="${stylesheet}">
 </head>
 <body>
@@ -391,7 +396,31 @@ export function shell({ title, description, content, stylesheet, assetPrefix = "
 </html>`;
 }
 
-export const header = (home, archive, activePage = "home") => `
+export const header = (home, archive, activePage = "home", options = {}) => {
+  const opts = typeof options === "string" ? { locale: options } : options;
+  const locale = opts.locale || "zh";
+  const zhHref = opts.zhHref || (opts.langSwitchHref && locale === "en" ? opts.langSwitchHref : "./");
+  const enHref = opts.enHref || (opts.langSwitchHref && locale === "zh" ? opts.langSwitchHref : "./");
+  const t = getT(locale);
+
+  const editorialLangToggle = `
+    <div class="header-lang-switch" role="navigation" aria-label="Language selection">
+      <a href="${zhHref}" class="lang-btn ${locale === "zh" ? "is-active" : ""}" onclick="try{localStorage.setItem('kh-lang','zh')}catch(e){}">中</a>
+      <span class="lang-sep">/</span>
+      <a href="${enHref}" class="lang-btn ${locale === "en" ? "is-active" : ""}" onclick="try{localStorage.setItem('kh-lang','en')}catch(e){}">EN</a>
+    </div>`;
+
+  const magLangToggle = `
+    <div class="mag-lang-switch" role="navigation" aria-label="Language selection">
+      <a href="${zhHref}" class="mag-lang-btn ${locale === "zh" ? "is-active" : ""}" onclick="try{localStorage.setItem('kh-lang','zh')}catch(e){}">中</a>
+      <span class="mag-lang-sep">/</span>
+      <a href="${enHref}" class="mag-lang-btn ${locale === "en" ? "is-active" : ""}" onclick="try{localStorage.setItem('kh-lang','en')}catch(e){}">EN</a>
+    </div>`;
+
+  const cyberLangToggle = `
+    <span class="cyber-lang-switch">[LANG: <a href="${zhHref}" class="${locale === "zh" ? "is-active" : ""}" onclick="try{localStorage.setItem('kh-lang','zh')}catch(e){}">ZH</a>|<a href="${enHref}" class="${locale === "en" ? "is-active" : ""}" onclick="try{localStorage.setItem('kh-lang','en')}catch(e){}">EN</a>]</span>`;
+
+  return `
 <header class="site-header">
   <div class="site-header-editorial-bar">
     <a class="site-title" href="${home}">
@@ -404,9 +433,11 @@ export const header = (home, archive, activePage = "home") => `
       </svg>
       <span>Khalil</span>
     </a>
-    <nav class="nav-editorial" aria-label="主导航">
-      <a href="${home}" class="${activePage === "home" ? "is-active" : ""}">Blog</a>
-      <a href="${archive}" class="${activePage === "archive" ? "is-active" : ""}">Archive</a>
+    <nav class="nav-editorial" aria-label="${locale === "en" ? "Main navigation" : "主导航"}">
+      ${editorialLangToggle}
+      <span class="header-nav-divider" aria-hidden="true">|</span>
+      <a href="${home}" class="${activePage === "home" ? "is-active" : ""}">${t.navBlog}</a>
+      <a href="${archive}" class="${activePage === "archive" ? "is-active" : ""}">${t.navArchive}</a>
       <a href="https://github.com/KhalilHsu" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </nav>
   </div>
@@ -422,11 +453,13 @@ export const header = (home, archive, activePage = "home") => `
     </div>
     <div class="mag-bar-primary">
       <div class="mag-bar-left">
-        <a href="${home}" class="mag-crumb ${activePage === "home" ? "is-current" : ""}">HOME</a>
+        <a href="${home}" class="mag-crumb ${activePage === "home" ? "is-current" : ""}">${t.magHome}</a>
       </div>
-      <nav class="mag-nav-links" aria-label="画报导航">
-        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">BLOG</a>
-        <a href="${archive}" class="${activePage === "archive" ? "is-current" : ""}">ARCHIVE</a>
+      <nav class="mag-nav-links" aria-label="${locale === "en" ? "Magazine navigation" : "画报导航"}">
+        ${magLangToggle}
+        <span class="mag-crumb-sep">|</span>
+        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">${t.magBlog}</a>
+        <a href="${archive}" class="${activePage === "archive" ? "is-current" : ""}">${t.magArchive}</a>
         <a href="https://github.com/KhalilHsu" target="_blank" rel="noopener noreferrer">GITHUB ↗</a>
       </nav>
     </div>
@@ -435,26 +468,30 @@ export const header = (home, archive, activePage = "home") => `
   <div class="site-header-cyber-masthead">
     <div class="cyber-masthead-main">
       <a class="cyber-logo" href="${home}"><span class="cyber-prompt-sym">&gt;</span> KHALIL<span class="cyber-cursor">_</span></a>
-      <span class="cyber-status-pill">● ONLINE // NETRUNNER_V3.0</span>
+      <span class="cyber-status-pill">${t.cyberStatus}</span>
     </div>
     <div class="cyber-bar-primary">
       <div class="cyber-bar-left">
-        <span class="cyber-cli-prompt">root@random-shit:~$</span>
-        <span class="cyber-cli-cmd">${activePage === "home" ? "ls -la ./blog" : (activePage === "archive" ? "cat ./archive" : "view ./article")}</span>
+        <span class="cyber-cli-prompt">${t.cyberPrompt}</span>
+        <span class="cyber-cli-cmd">${activePage === "home" ? t.cyberCmdBlog : (activePage === "archive" ? t.cyberCmdArchive : t.cyberCmdArticle)}</span>
       </div>
-      <nav class="cyber-nav-links" aria-label="深潜终端导航">
-        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">[./BLOG]</a>
-        <a href="${archive}" class="${activePage === "archive" ? "is-current" : ""}">[./ARCHIVE]</a>
+      <nav class="cyber-nav-links" aria-label="${locale === "en" ? "Cyberdeck navigation" : "深潜终端导航"}">
+        ${cyberLangToggle}
+        <span class="cyber-sep">|</span>
+        <a href="${home}" class="${activePage === "home" ? "is-current" : ""}">${t.cyberNavBlog}</a>
+        <a href="${archive}" class="${activePage === "archive" ? "is-current" : ""}">${t.cyberNavArchive}</a>
         <a href="https://github.com/KhalilHsu" target="_blank" rel="noopener noreferrer">[./GITHUB ↗]</a>
       </nav>
     </div>
   </div>
 </header>`;
+};
 
-export const postItem = (post, prefix = "post/", mediaPrefix = "", index) => {
+export const postItem = (post, prefix = "post/", mediaPrefix = "", index, locale = "zh") => {
   const coverSrc = post.isFallbackCover
     ? `${mediaPrefix}assets/placeholder-cover.png`
     : (post.cover.startsWith("http") ? post.cover : `${mediaPrefix}${prefix}${post.slug}/${post.cover}`);
+  const fallbackBadgeHtml = post.isFallbackLang ? ` <span class="tag-badge zh-only-badge">${getT(locale).fallbackBadge}</span>` : "";
   return `
 <article class="post-item"${typeof index === "number" ? ` data-color-index="${index}"` : ""}>
   <a class="list-cover" href="${prefix}${post.slug}/">
@@ -468,7 +505,7 @@ export const postItem = (post, prefix = "post/", mediaPrefix = "", index) => {
       <time datetime="${post.date}" class="post-date-badge">${formatDateShort(post.date)}</time>
       <div class="post-tags-container">
         <p class="tag">${escapeHtml(post.tags)}</p>
-        <div class="tag-badges">${renderTagBadges(post.tags)}</div>
+        <div class="tag-badges">${renderTagBadges(post.tags)}${fallbackBadgeHtml}</div>
       </div>
     </div>
     <h2><a href="${prefix}${post.slug}/">${escapeHtml(post.title)}</a></h2>
@@ -478,8 +515,11 @@ export const postItem = (post, prefix = "post/", mediaPrefix = "", index) => {
 </article>`;
 };
 
-export const archiveItem = (post, prefix) => `
+export const archiveItem = (post, prefix, locale = "zh") => {
+  const fallbackBadgeHtml = post.isFallbackLang ? ` <span class="tag-badge zh-only-badge">${getT(locale).fallbackBadge}</span>` : "";
+  return `
 <article class="archive-item">
   <time datetime="${post.date}" class="archive-date">${formatDateDot(post.date)}</time>
-  <a href="${prefix}${post.slug}/" class="archive-title">${escapeHtml(post.title)}</a>
+  <a href="${prefix}${post.slug}/" class="archive-title">${escapeHtml(post.title)}${fallbackBadgeHtml}</a>
 </article>`;
+};
