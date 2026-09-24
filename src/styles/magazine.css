@@ -347,14 +347,20 @@ html[data-theme="cards"] .article-body p { margin: 0 0 1.6em; }
 html[data-theme="magazine"] .article-body figure,
 html[data-theme="cards"] .article-body figure { margin: 2.5em 0; border: none; background: transparent; }
 html[data-theme="magazine"] .article-body img,
-html[data-theme="cards"] .article-body img,
+html[data-theme="cards"] .article-body img { width: 100%; display: block; border-radius: 4px; }
 html[data-theme="magazine"] .article-body video,
-html[data-theme="cards"] .article-body video { width: 100%; display: block; border-radius: 4px; }
+html[data-theme="cards"] .article-body video { max-width: 100%; max-height: 65vh; display: block; border-radius: 4px; margin: 0 auto; }
+html[data-theme="magazine"] .article-body .media-video,
+html[data-theme="cards"] .article-body .media-video { display: flex; flex-direction: column; align-items: center; margin: 2.5em auto; }
+html[data-theme="magazine"] .article-body .media-video.media-video-portrait video,
+html[data-theme="cards"] .article-body .media-video.media-video-portrait video { width: 100%; max-width: 320px; max-height: 65vh; object-fit: contain; margin: 0 auto; border-radius: 8px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1); }
 html[data-theme="magazine"] .article-body figcaption,
 html[data-theme="cards"] .article-body figcaption {
   margin-top: 8px; padding: 0; background: transparent; color: #666666;
   font-family: var(--font-sans); font-size: 13px; font-weight: 500; text-transform: none; border-top: none;
 }
+html[data-theme="magazine"] .article-body .media-video figcaption,
+html[data-theme="cards"] .article-body .media-video figcaption { text-align: center; }
 html[data-theme="magazine"] .article-body code,
 html[data-theme="cards"] .article-body code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;

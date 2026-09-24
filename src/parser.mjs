@@ -58,10 +58,13 @@ export function paragraphize(body, imagePrefix = "") {
       if (mediaMatches.length === 1) {
         const alt = escapeHtml(mediaMatches[0][1]);
         const rawSrc = mediaMatches[0][2];
-        const src = resolveSrc(rawSrc);
-        const isVideo = mediaMatches[0][0].startsWith("@video") || /\.(mp4|mov|webm|m4v|ogg)$/i.test(rawSrc);
+        const isPortrait = /#(?:portrait|narrow|mobile)/i.test(rawSrc);
+        const cleanSrc = rawSrc.replace(/#.*$/, "");
+        const src = resolveSrc(cleanSrc);
+        const isVideo = mediaMatches[0][0].startsWith("@video") || /\.(mp4|mov|webm|m4v|ogg)$/i.test(cleanSrc);
         if (isVideo) {
-          return `<figure class="media-video"><video src="${src}" controls playsinline preload="metadata"></video>${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
+          const portraitClass = isPortrait ? " media-video-portrait" : "";
+          return `<figure class="media-video${portraitClass}"><video src="${src}" controls playsinline preload="metadata"></video>${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
         }
         return `<figure class="media-image"><img src="${src}" alt="${alt}" loading="lazy">${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
       }

@@ -83,6 +83,37 @@ img, video {
   display: block;
 }
 
+.media-video {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2.5em 0;
+  text-align: center;
+}
+
+.media-video video {
+  max-width: 100%;
+  max-height: 65vh;
+  width: auto;
+  margin: 0 auto;
+  display: block;
+}
+
+.media-video.media-video-portrait video {
+  width: 100%;
+  max-width: 320px;
+  max-height: 65vh;
+  object-fit: contain;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.media-video figcaption {
+  text-align: center;
+  margin-top: 10px;
+}
+
 .media-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
