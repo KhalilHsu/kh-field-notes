@@ -14,8 +14,8 @@ html[data-theme="editorial"] {
   --ink: #20201e;
   --muted: #74736e;
   --rule: #deddd8;
-  --font-editorial-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
-  --font-editorial-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+  --font-editorial-sans: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  --font-editorial-display: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
   background: var(--paper);
 }
 
@@ -96,7 +96,10 @@ html[data-theme="editorial"] .site-title {
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.01em;
-  color: inherit;
+  color: #141413;
+  -webkit-font-smoothing: auto;
+  -webkit-text-stroke: 0.45px currentColor;
+  paint-order: stroke fill;
   text-decoration: none;
   transform-origin: left center;
   transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
@@ -144,10 +147,10 @@ html[data-theme="editorial"] time {
 }
 
 html[data-theme="editorial"] .page h1 {
-  font-family: var(--font-editorial-display);
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.18;
+  font-family: ui-serif, Georgia, "Songti SC", "Noto Serif SC", serif;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
   margin: 12px 0 16px;
   font-size: clamp(2.125rem, 1.5rem + 3.2vw, 3.5rem);
   text-wrap: balance;
@@ -197,9 +200,10 @@ html[data-theme="editorial"] .post-item h2 {
   margin: 0;
   font-family: var(--font-editorial-display);
   font-size: 1.4375rem;
-  font-weight: 400;
+  font-weight: 450;
   line-height: 1.38;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.015em;
+  color: #161614;
   text-wrap: balance;
 }
 
@@ -247,9 +251,10 @@ html[data-theme="editorial"] .article-date { display: block; margin-bottom: 20px
 html[data-theme="editorial"] .article h1 {
   font-family: var(--font-editorial-display);
   font-size: clamp(1.875rem, 1.35rem + 2.2vw, 2.75rem);
-  font-weight: 400;
+  font-weight: 450;
   letter-spacing: -0.018em;
   line-height: 1.28;
+  color: #161614;
   margin: 14px 0 20px;
   max-width: 100%;
   text-wrap: balance;
@@ -281,7 +286,7 @@ html[data-theme="editorial"] .article-body p {
   text-wrap: pretty;
 }
 html[data-theme="editorial"] .article-body strong {
-  font-weight: 500;
+  font-weight: 550;
   color: #141412;
 }
 html[data-theme="editorial"] .article-body figure { margin: 2.5em 0; }
@@ -307,8 +312,8 @@ html[data-theme="editorial"] .article-body h3,
 html[data-theme="editorial"] .article-body h4 {
   color: var(--ink);
   font-family: var(--font-editorial-display);
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-weight: 550;
+  letter-spacing: -0.012em;
   text-wrap: balance;
 }
 html[data-theme="editorial"] .article-body hr {
